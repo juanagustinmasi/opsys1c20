@@ -2,7 +2,7 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: tp1_ejercicioX
+# Nombre del script: Ejercicio6.sh
 # Trabajo practico: 1
 # Ejercicio: 6
 # Entrega: 1ra entrega
@@ -54,7 +54,7 @@ then
     exit
 fi
 
-#Validacion archivo, que exista archivo y que no vacio.
+#Validacion archivo.
 if ! [[ -f "$2" ]]
 then
     echo "ERROR. Archivo inexistente"

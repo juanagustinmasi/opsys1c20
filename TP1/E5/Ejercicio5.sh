@@ -2,7 +2,7 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: tp1_ejercicio5
+# Nombre del script:Ejercicio5.sh
 # Trabajo practico: 1
 # Ejercicio: 5
 # Entrega: 1ra entrega

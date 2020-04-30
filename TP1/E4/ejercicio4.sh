@@ -2,9 +2,9 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: tp1_ejercicioX
+# Nombre del script: Ejercicio4.sh
 # Trabajo practico: 1
-# Ejercicio: X
+# Ejercicio: 4
 # Entrega: 1ra entrega
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120

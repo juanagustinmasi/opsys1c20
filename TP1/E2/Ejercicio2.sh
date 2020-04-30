@@ -9,7 +9,7 @@
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
-#       Guido Delbo, DNI 36982261
+#     Guido Delbo, DNI 36982261
 #	    Nicolas Fortunato, DNI 37864810
 #	    Damian Perez, DNI 35375255
 #
