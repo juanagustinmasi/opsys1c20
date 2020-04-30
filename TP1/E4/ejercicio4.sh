@@ -25,6 +25,25 @@
 #
 # -------------------AYUDA Y VALIDACIONES------------------------------------------------------------------#
 
+if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]
+then
+	echo "Ejercicio N° 4"
+	echo "Synopsis: Este Script evalua todos los logs, dejando solamente los de la última semana de cada empresa."
+ 	echo "Los archivos anteriores los comprime en un directorio y los elimina.."
+   	 echo "De acuerdo a los parametros que se pasen se puede revisar los logs de todas las empresas o de una especifica"
+    	echo "Los archivos de logs deben tener el siguiente un formato especifico"
+        echo "El formato debe ser Empresa-numeroDeLaSemana.log" 
+	echo "Ejemplo de ejecucion"
+	echo "./ejercicio4.sh  -f <path_directorio_Log> -z <path_directorio_Zip> "
+	echo "./ejercicio4.sh  -f <path_directorio_Log> -z <path_directorio_Zip> -e <empresa> "
+	echo "<path_directorio_Log>: Directorio en el que se encuentran los archivos de log."
+  	echo "<path_directorio_Zip>: Directorio n el que se generarán los archivos comprimidos de los clientes."
+	echo "<empresa>: Nombre de la empresa a procesar. (opcional)."
+	echo "./ejercicio4.sh -f CasosDePrueba/ArchivosLog/Enunciado -z CasosDePrueba/ArchivosComprimidos"
+	echo "./ejercicio4.sh -f CasosDePrueba/ArchivosLog/Enunciado -z CasosDePrueba/ArchivosComprimidos -e unlam"
+ 	exit 0;
+fi
+
 if ! [[ $# -eq 4 || $# -eq 6 ]]
 then
 	echo "La cantidad de parametros ingresados es incorrecta"
@@ -58,7 +77,7 @@ then
 	origen=`pwd` 
 	origen="$origen/$2" 
 	destino=`pwd` 
-	destino="$destino/$4/archivo.zip" 
+	destino="$destino/$4/archivoBackup.zip" 
 	cd "$origen";
 
 	EMPRESA_INICIAL=" "       
@@ -79,7 +98,7 @@ else
 	origen=`pwd` 
 	origen="$origen/$2" 
 	destino=`pwd` 
-	destino="$destino/$4/archivo.zip" 
+	destino="$destino/$4/archivoBackup.zip" 
 	cd "$origen";
 	
 	VERSION=1
