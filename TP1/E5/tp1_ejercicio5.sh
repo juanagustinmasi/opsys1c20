@@ -75,12 +75,17 @@ gawk 'function materia_nueva(id) {
 
     return 1
 }
-function es_valido(dni, notaPri, notaSeg, rec, notaRec, notaFin) {
+function es_valido(dni, id, notaPri, notaSeg, rec, notaRec, notaFin) {
     
     if(dni !~ /^[0-9]{1,8}$/) {
         return 0
     }
     
+    if(id !~ /^[0-9]*$/) {
+        return 0
+    }
+    
+
     if(notaFin ~ /^[4-9]$|^10$/) {
         return 0
     }
@@ -109,11 +114,11 @@ function abandona(notaPri, notaSeg, notaRec) {
         return 1
     }
 
-    if( (notaPri ~ /^[4-9]$|^10$/) && (notaSeg ~ /^\s$/) && (notaRec ~ /^\s$/) ) {
+    if( (notaPri ~ /^[4-9]$|^10$/) && (notaSeg ~ /^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
-    if( (notaSeg ~ /^[4-9]$|^10$/) && (notaPri ~ /^\s$/) && (notaRec ~ /^\s$/) ) {
+    if( (notaSeg ~ /^[4-9]$|^10$/) && (notaPri ~ /^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
@@ -125,19 +130,19 @@ function recupera(notaPri, notaSeg, rec, notaRec) {
         return 0
     }
 
-    if( (notaPri ~ /^[0-3]$/) && (notaSeg ~ /^[4-9]$|^10$/) && ( (rec == 1) || (rec == "") ) && (notaRec == "") ) {
+    if( (notaPri ~ /^[0-3]$/) && (notaSeg ~ /^[4-9]$|^10$/) && (rec ~ /^1$|^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
-    if( (notaSeg ~ /^[0-3]$/) && (notaPri ~ /^[4-9]$|^10$/) && ( (rec == 2) || (rec == "") ) && (notaRec == "") ) {
+    if( (notaSeg ~ /^[0-3]$/) && (notaPri ~ /^[4-9]$|^10$/) && (rec ~ /^2$|^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
-    if( (notaPri ~ /^[4-6]$/) && (notaSeg ~ /^[7-9]$|^10$/) && ( (rec == 1) || (rec == "") ) && (notaRec == "") ) {
+    if( (notaPri ~ /^[4-6]$/) && (notaSeg ~ /^[7-9]$|^10$/) && (rec ~ /^1$|^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
-    if( (notaSeg ~ /^[4-6]$/) && (notaPri ~ /^[7-9]$|^10$/) && ( (rec == 2) || (rec == "") ) && (notaRec == "") ) {
+    if( (notaSeg ~ /^[4-6]$/) && (notaPri ~ /^[7-9]$|^10$/) && (rec ~ /^2$|^\s*$/) && (notaRec ~ /^\s*$/) ) {
         return 1
     }
 
@@ -221,7 +226,7 @@ function recursa(notaPri, notaSeg, rec, notaRec, notaFin) {
     return 0
 }
 BEGIN {FS = "|"; i=0; materias[0]=0;}
-(es_valido($1, $3, $4, $5, $6, $7) == 1) {
+(es_valido($1, $2, $3, $4, $5, $6, $7) == 1) {
     
     if(materia_nueva($2) == 1)
         materias[i]=$2
@@ -250,7 +255,7 @@ END {
         }
 
     }
-}' "$2" > ./salida1
+}' "$2" > ./salida.txt
 
 # ------------------------FIN MAIN-------------------------------------------------------------------------#
 #
