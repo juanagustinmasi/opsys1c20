@@ -105,7 +105,7 @@ else
 		
 	for file in `find "$origen" -maxdepth 1 -type f -regex ".+-[0-9]+.log" -exec basename {} \; | sort -r -V`
     		do
-	        	if [[ $(echo "$6" | cut -d '-' -f 1) = $(echo "$file" | cut -d '-' -f 1) ]]
+	        	if [[ $(echo "$file" | cut -d '-' -f 1) = $(echo "$6" | cut -d '-' -f 1) ]]
 	       		then
 				if [[ $VERSION -ne 0 ]]
 		                then
