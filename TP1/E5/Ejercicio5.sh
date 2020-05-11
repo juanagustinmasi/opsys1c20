@@ -2,10 +2,10 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script:Ejercicio5.sh
+# Nombre del script: Ejercicio5
 # Trabajo practico: 1
 # Ejercicio: 5
-# Entrega: 1ra entrega
+# Entrega: 2da
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
@@ -255,7 +255,7 @@ END {
         }
 
     }
-}' "$2" > ./salida.txt
+}' "$2" > ./salida
 
 # ------------------------FIN MAIN-------------------------------------------------------------------------#
 #

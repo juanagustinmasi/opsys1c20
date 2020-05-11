@@ -2,10 +2,10 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: Ejercicio4.sh
+# Nombre del script: Ejercicio4
 # Trabajo practico: 1
 # Ejercicio: 4
-# Entrega: 1ra entrega
+# Entrega: 2da
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
