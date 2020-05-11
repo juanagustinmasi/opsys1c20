@@ -2,14 +2,14 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: Ejercicio1
+# Nombre del script: Ejercicio2
 # Trabajo practico: 1
-# Ejercicio: 1
+# Ejercicio: 2
 # Entrega: 1ra entrega
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
-#     Guido Delbo, DNI 36982261
+#       Guido Delbo, DNI 36982261
 #	    Nicolas Fortunato, DNI 37864810
 #	    Damian Perez, DNI 35375255
 #
@@ -20,7 +20,9 @@ ErrorS()
  echo "Error. La sintaxis del script es la siguiente:"
  echo "Para obtener la cantidad de líneas del archivo : $0 nombre_archivo L" 
  echo "Para obtener la cantidad de caracteres del archivo : $0 nombre_archivo C" 
- echo "Para obtener la longitud de la linea mas larga del archivo : $0 nombre_archivo M" 
+ echo "Para obtener la longitud de la linea mas larga del archivo : $0 nombre_archivo M"
+ #Se agrega esta línea para que no imprima dos veces el mensaje y salga del script directamente
+ exit  
 }
 
 ErrorP()
@@ -77,7 +79,6 @@ fi
 #    El contenido entre las comillas simples se interpreta de manera literal, mientras que al utilizar comillas dobles interpretan
 #    las variables y caracteres especiales, reemplazandolos por su contenido.En cambio, las comillas invertidas se utilizan
 #    con ordenes o funciones, y se sustituyen por la salida del programa que esto entre las comillas invertidas.
-
 # ------------------------FIN -------------------------------------------------------------------------#
 # SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
 # ---------------------------------------------------------------------------------------------------------#
