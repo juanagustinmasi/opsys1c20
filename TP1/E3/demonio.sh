@@ -25,9 +25,9 @@ function buscarEliminar() {
 
     #Se busca de forma no recursiva en el directorio los ficheros que cumplan con el formato adecuado
     #se los ordena y compara por el identificador de empresa para saber que corresponden a la misma
-    for file in `find $1 -maxdepth 1 -type f -regex "*+-[0-9]+.log" -exec basename {} \; | sort -r -V`
+    for file in `find "$origen" -maxdepth 1 -type f -regex ".+-[0-9]+.log" -exec basename {} \; | sort -r -V`
     	do
-      	  if [[ $(echo "$EMPRESA_INICIAL" | cut -d '-' -f 1) = $(echo "$file" | cut -d '-' -f 1) ]]
+      	  if [[ $(echo "$EMPRESA_INICIAL" | cut -d '-' -f 1) == $(echo "$file" | cut -d '-' -f 1) ]]
      	   then
         	    echo "$file"
           	    rm $file
@@ -44,7 +44,9 @@ function buscarEliminar() {
 #Muestro el pid en caso de que se quiera matar al demonio
 echo "Se inicia el demonio, su PID es $$"
 #Me paro en el directorio a analizar
-cd "$1"
+origen=`pwd`
+origen="$origen"/$1
+cd "$origen"
 #Inicio el ciclo infinito
 while [ 1 -eq 1 ]
 do

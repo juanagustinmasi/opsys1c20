@@ -2,7 +2,7 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: Ejercicio3
+# Nombre del script: ejercicio3
 # Trabajo practico: 1
 # Ejercicio: 3
 # Entrega: 1ra entrega
@@ -38,7 +38,7 @@ function ayuda() {
 
 # -------------------AYUDA Y VALIDACIONES------------------------------------------------------------------#
 
-if [[ $1 == "-help" || $1 == "-h" || $1 == "-?" ]]
+if [[ "$1" == "-help" || "$1" == "-h" || "$1" == "-?" ]]
 then
     ayuda
     exit 1;
