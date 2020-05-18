@@ -2,10 +2,10 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: Ejercicio6.sh
+# Nombre del script: Ejercicio6
 # Trabajo practico: 1
 # Ejercicio: 6
-# Entrega: 1ra entrega
+# Entrega: 2da
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
@@ -32,6 +32,7 @@ function suma () {
 # ------------------------FIN FUNCIONES---------------------------------------------------------------------#
 #
 # -------------------AYUDA Y VALIDACIONES------------------------------------------------------------------#
+
 if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]
 then
  echo "Este Script permite realizar la suma de todos los números fraccionarios contenidos en un archivo"

@@ -2,10 +2,10 @@
 #
 # -----------------------ENCABEZADO------------------------------------------------------------------------#
 #
-# Nombre del script: Ejercicio4.sh
+# Nombre del script: Ejercicio4
 # Trabajo practico: 1
 # Ejercicio: 4
-# Entrega: 1ra entrega
+# Entrega: 2da
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
@@ -77,17 +77,20 @@ then
 	origen=`pwd` 
 	origen="$origen/$2" 
 	destino=`pwd` 
-	destino="$destino/$4/archivoBackup.zip" 
+	destino="$destino/$4" 
 	cd "$origen";
 
-	EMPRESA_INICIAL=" "       
+	EMPRESA_INICIAL=" "
+	NOM_EMPRESA=" "
+	EXTENSION=".zip"        
 	
 	for file in `find "$origen" -maxdepth 1 -type f -regex ".+-[0-9]+.log" -exec basename {} \; | sort -r -V`
 		do
         		if [[ $(echo "$file" | cut -d '-' -f 1) = $(echo "$EMPRESA_INICIAL" | cut -d '-' -f 1) ]]
        			then
             			echo "$file"
-	    			zip -r "$destino" "$file"
+				NOM_EMPRESA=$(echo "$EMPRESA_INICIAL" | cut -d '-' -f 1)
+	    			zip -r "$destino/$NOM_EMPRESA$EXTENSION" "$file"
             			rm "$origen/$file"
       		  	else
             			EMPRESA_INICIAL=$file
@@ -98,7 +101,9 @@ else
 	origen=`pwd` 
 	origen="$origen/$2" 
 	destino=`pwd` 
-	destino="$destino/$4/archivoBackup.zip" 
+	destino="$destino/$4"
+	destino+="$6"
+	destino+=".zip" 
 	cd "$origen";
 	
 	VERSION=1
