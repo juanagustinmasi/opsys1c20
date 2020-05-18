@@ -72,7 +72,7 @@ fi
 
 #Guardo archivo en una cadena
 cadNum="$( awk '{cadNum=$1} {print cadNum;}' "$2" )"
-
+ 
 IFS=',' read -a cadNum <<< $cadNum
 
 VecND=""
@@ -81,16 +81,27 @@ VecND=""
 for (( i=0; i<${#cadNum[@]}; i++ ))
 do
     numero=${cadNum[$i]} 
+
     [[ $numero =~ ([-0-9]+)(\:)([-0-9/]+) ]]
+
     entero=${BASH_REMATCH[1]} #capturo el entero
+
     fraccion=${BASH_REMATCH[3]} #captura fraccion
-    if [[ $entero == "" ]] #si no hay entero
+
+    if [[ $entero -eq "" ]] #si no hay entero
     then
         [[ $numero =~ ([-0-9]+)/([0-9]+) ]]
         numerador=${BASH_REMATCH[1]} #separo en numerador y
         denominador=${BASH_REMATCH[2]} #denominador capturandolos
-        VecND+=$numerador,$denominador, 
-    
+        if [[ $denominador -eq "" ]]
+        then 
+            denominador=1
+            VecND+=$numero,$denominador,
+        else
+            VecND+=$numerador,$denominador, 
+            
+        fi
+
     else
       
      [[ $fraccion =~ ([-0-9]+)/([0-9]+) ]]
@@ -112,8 +123,9 @@ do
         then
             numerador=$(( $numerador*(-1) ))
         fi
-        numerador=$(( ($entero*$denominador+$numerador) * $signo )) 
+        numerador=$(( (($entero*$denominador)+($signo)*$numerador) * $signo )) 
         VecND+=$numerador,$denominador,   
+        
     fi
 done
 
@@ -132,7 +144,7 @@ done
 
 
 #compruebo que numerador no sea 0 
-if (( $numRes == 0 ))
+if [[ $numRes -eq 0 ]]
     then 
         echo 0
         echo 0 > "$PWD/salida.out"
