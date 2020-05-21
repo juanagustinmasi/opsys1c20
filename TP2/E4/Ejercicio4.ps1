@@ -32,10 +32,10 @@ Nombre de la empresa a procesar. Es un parametro opcional.
 ./Ejercicio4.sh  -Directorio <path_directorio_Log> -DirectorioZip <path_directorio_Zip> -Empresa <empresa> "
 
 .EXAMPLE
-./Ejercicio4.sh -Directorio "CasosDePrueba/ArchivosLog/Enunciado" -DirectorioZip "CasosDePrueba/ArchivosComprimidos"
+./Ejercicio4.sh -Directorio "CasosDePrueba/ArchivosLog/Enunciado/" -DirectorioZip "CasosDePrueba/ArchivosComprimidos/"
 
 .EXAMPLE
-./Ejercicio4.sh -Directorio "CasosDePrueba/ArchivosLog/Enunciado" -DirectorioZip "CasosDePrueba/ArchivosComprimidos" -Empresa "unlam"
+./Ejercicio4.sh -Directorio "CasosDePrueba/ArchivosLog/Enunciado/" -DirectorioZip "CasosDePrueba/ArchivosComprimidos/" -Empresa "unlam"
 
 #>
 
