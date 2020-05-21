@@ -42,7 +42,15 @@ gci $Path -File | Where-Object {$_.length -gt 0} | ForEach-Object {
 
     $listaDeLlamadas=New-Object System.Collections.ArrayList
     $i = 0
-    Get-Content $_.FullName | ConvertFrom-String -Delimiter " _ " -PropertyNames Fecha, Usuario | Sort-Object -Property Usuario, Fecha | ForEach-Object {
+
+    $textoArchivo =$(Get-Content $_.FullName | %{
+        New-Object psobject -Property @{
+            Fecha = ($_).Split("_")[0].Trim(" ")
+            Usuario = ($_).Split("_")[1].Trim(" ")
+        }
+    })
+    
+    $textoArchivo | Sort-Object -Property Usuario, Fecha | ForEach-Object {
         $i++
         if( ($i % 2) -ne 0 ) {
             #comienza la llamada
@@ -117,6 +125,5 @@ gci $Path -File | Where-Object {$_.length -gt 0} | ForEach-Object {
     Write-Output "Usuario con mas llamadas bajo la media de la semana de $mediaSemanal segundos($([Math]::Truncate($mediaSemanal/60)) minutos $($mediaSemanal%60) segundos):"
     Write-Output "-------------------------------------------------------------------------------------------"
     $usuarioConMasBajoLaMedia | Format-List 
-
 
 }
