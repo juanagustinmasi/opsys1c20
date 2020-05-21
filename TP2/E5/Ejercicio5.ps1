@@ -29,9 +29,9 @@ Ejecución:
 #>
 
 
-Param([Parameter(Mandatory = $true)][string]$archivoEntrada)
+Param([Parameter(Mandatory = $true)][string]$Nomina)
 
-$esArchivo = Test-Path $archivoEntrada
+$esArchivo = Test-Path $Nomina
 
 if ($esArchivo -eq $false) {
 
@@ -41,7 +41,8 @@ if ($esArchivo -eq $false) {
 
 # Guardo cada campo de cada línea del archivo de entrada
 
-$registro = Import-CSV -Delimiter '|' -Path $archivoEntrada
+$registro = Import-CSV -Delimiter '|' -Path $Nomina
+
 
 if ($registro.length -eq 0) {
 
@@ -347,7 +348,8 @@ foreach ($reg in $registro) {
     }
 }
 
-$salida | Export-Csv ".\salida1.csv" -NoTypeInformation
+$salida | Export-Csv "$PSScriptRoot/salida1.csv" -NoTypeInformation
+
 
 # ------------------------FIN MAIN-------------------------------------------------------------------------#
 #
