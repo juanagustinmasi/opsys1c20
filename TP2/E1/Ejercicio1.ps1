@@ -5,7 +5,7 @@ Param (
 #>
  [Parameter(Position = 1, Mandatory = $true)]
  [ValidateLength(2,256)]
- [ValidateScript({Test-Path $_ -PathType ‘Leaf’})]
+ [ValidateScript({Test-Path $_ -PathType Leaf})]
  [String] $pathsalida,
  [Parameter(Position = 2)]
  #[ValidateRangeKind("Positive")]
