@@ -22,6 +22,7 @@
      ! (($1%$2)) && return $2 || mcd $2 $(($1%$2))
  )
 
+
 function suma () {
     mcd $2 $4
     res=$?
@@ -29,6 +30,20 @@ function suma () {
     numRes=$(( ($1*$mcm/$2) + ($3*$mcm/$4) ))
     denRes=$mcm
 }
+
+function simplificar () {
+	mcd $1 $2
+	res=$?
+
+	if [[ $res -ne 0 && ($res -le numRes || $res -le denRes) && $numRes -ne 0 && $denRes -ne 0 && $numRes -ne "" && $denRes -ne "" ]]
+	
+	then
+	numRes=$(( $numRes / $res ))
+	denRes=$(( $denRes / $res ))
+
+	fi
+}
+
 # ------------------------FIN FUNCIONES---------------------------------------------------------------------#
 #
 # -------------------AYUDA Y VALIDACIONES------------------------------------------------------------------#
@@ -63,7 +78,7 @@ then
 else
     if ! [[ -s "$2" ]]
     then
-        echo "Error el archivo en la ruta $2 esta vacia ."
+        echo "Error el archivo en la ruta $2 esta vacio ."
         exit
     fi
 fi
@@ -124,8 +139,8 @@ do
         then
             numerador=$(( $numerador*(-1) ))
         fi
-        numerador=$(( (($entero*$denominador)+($signo)*$numerador) * $signo )) 
-        VecND+=$numerador,$denominador,   
+        numerador=$(( ($entero*$denominador+$numerador) * $signo ))
+        VecND+=$numerador,$denominador,
         
     fi
 done
@@ -141,17 +156,20 @@ do
     den2=${VecND[$i+1]}
     #hago la suma contemplando el algoritmo de mcd de euclides
     suma $numRes $denRes $num2 $den2
+	
 done
+
+simplificar $numRes $denRes
 
 
 #compruebo que numerador no sea 0 
 if [[ $numRes -eq 0 ]]
     then 
-        echo 0
-        echo 0 > "$PWD/salida.out"
+         echo 0
+         echo 0 > "$PWD/salida.out"
     else
-    echo "$numRes/$denRes"
-    echo "$numRes/$denRes" > "$PWD/salida.out"
+         echo "$numRes/$denRes"
+         echo "$numRes/$denRes" > "$PWD/salida.out"
 fi
 
 # ------------------------FIN MAIN-------------------------------------------------------------------------#
