@@ -120,9 +120,16 @@ foreach( $i in $vectorFracciones ){
         
         $mixta = @()
         $mixta += $fraccion[0].Split(':') #separo la fraccion convirtiendo de fraccion mixta
+        if ([int]$mixta[0] -lt 0 )
+        {
+        $numerador = ([int]$mixta[0] * (-1) * [int]$fraccion[1]) + [int]$mixta[1]  #En fraccion impropia
+        $denominador = [int]$fraccion[1] 
+        $signo++
+        }
+        else{
         $numerador = ([int]$mixta[0] * [int]$fraccion[1]) + [int]$mixta[1]  #En fraccion impropia
         $denominador = [int]$fraccion[1] 
-
+        }
     }
     else {
 
