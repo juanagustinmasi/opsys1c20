@@ -25,13 +25,13 @@ if ($existe -eq $true) {
 }
 <#
 Responder:
-1. ¿Cual es el objetivo del script?
+1. ï¿½Cual es el objetivo del script?
  Su objetivo es escribir en el archivo que recibe por parametro los procesos que estan corriendo en ese momento.
  y muestra por pantalla los primeros tres procesos de esa lista, o tantos como reciba por parametro.
-2. ¿Agregaria alguna otra validacion a los parametros?
+2. ï¿½Agregaria alguna otra validacion a los parametros?
  Si, pondria $pathsalida como mandatorio y validaria su longitud, y que $cantidad pueda accederse por la position.
  Se agregan las validaciones en comentarios en el codigo
-3. ¿Que sucede si se ejecuta el script sin ningun parametro?
+3. ï¿½Que sucede si se ejecuta el script sin ningun parametro?
  Por pantalla se muestra "El path no existe" ya que valida directamente si $pathsalida existe, sin consultar que sea nulo.
  Con los cambios que realice ya no muestra ese mensaje sino que devuelve un error de validacion del parametro pathsalida.
 #>

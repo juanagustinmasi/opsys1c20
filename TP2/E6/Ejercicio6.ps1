@@ -25,10 +25,10 @@
         Guardando en un archivo salida.out (en el mismo directorio) el resultado e informandolo por salida standard
 
 .INPUTS 
-        -Entrada: Ruta del archivo de entrada (relativa o absoluta).
+        -Path: Ruta del archivo de entrada (relativa o absoluta).
         
 .EXAMPLE
-  Ejemplo de ejecucion:> .\ejercicio6.ps1 -Entrada .\enunciado.in
+  Ejemplo de ejecucion:> .\ejercicio6.ps1 -Path .\enunciado.in
 
                        >2741/360
 .EXAMPLE
@@ -45,7 +45,7 @@
 
 Param(
 
-   [parameter(Mandatory = $true)] [string] $Entrada,
+   [parameter(Mandatory = $true)] [string] $Path,
    [parameter(ValueFromRemainingArguments=$true)] $Otros=$NULL
 	
 )
@@ -86,14 +86,14 @@ if($Otros -ne $NULL) { #validacion de parametros
     exit
 }
 
-$existe = Test-Path $Entrada 
+$existe = Test-Path $Path 
 
 if ($existe -ne $true) {
    write-host -ForegroundColor red "Archivo de entrada inexistente, por favor ingrese un archivo valido"
    exit 1
 }
 
-$valor = Get-Content $Entrada #Guardo el contenido del archivo
+$valor = Get-Content $Path #Guardo el contenido del archivo
 
 if($valor -eq $NULL) { 
     Write-Host -ForegroundColor red "0. Archivo vacio"
