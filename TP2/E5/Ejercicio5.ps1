@@ -55,6 +55,8 @@ if ($registro.length -eq 0) {
 #
 # ------------------------------------------FUNCIONES------------------------------------------------------------------#
 
+# Función para desestimar todos los registros que no cumplan ninguna de las 4 condiciones a contabilizar
+
 function esValido {
     param (
         [string]$dni,
@@ -94,6 +96,8 @@ function esValido {
     return 1
 }
 
+# Función para verificar la condición "Abandona"
+
 function abandona {
     param (
         [string]$notaPri,
@@ -120,6 +124,8 @@ function abandona {
     return 0
 
 }
+
+# Función para verificar la condición "Recupera"
 
 function recupera {
     param (
@@ -153,6 +159,8 @@ function recupera {
     return 0
 
 }
+
+# Función para verificar la condición "Final"
 
 function final {
     param (
@@ -190,6 +198,8 @@ function final {
     return 0
 
 }
+
+# Función para verificar la condición "Recursa"
 
 function recursa {
     param (
@@ -249,6 +259,8 @@ function recursa {
 
 }
 
+# Clase para almacenar los registros de salida
+
 class Materia {
     [int]$Materia
     [int]$Final
@@ -257,10 +269,11 @@ class Materia {
     [int]$Abandonaron
 }
 
-
 # ------------------------------FIN FUNCIONES---------------------------------------------------------------#
 #
 # ----------------------------------MAIN--------------------------------------------------------------------#
+
+# Declaro un array para almacenar todos los objetos de salida
 
 $salida = @()
 
@@ -272,9 +285,16 @@ foreach ($reg in $registro) {
 
         $materia = New-Object -Typename Materia
         $materia.Materia = $id
+
+        # Flag para saber si la materia actual ya la tengo en el array de salida
+
         $esNuevo = 1
 
+        # Verifico la condición correspondiente e incremento el campo correspondiente
+
         if (final $reg.PrimerParcial $reg.SegundoParcial $reg.RecuParcial $reg.RecuNota $reg.Final) {
+
+            # Si ya tengo la materia en el array de salida, solo incremento el campo correspondiente a cada condición
 
             foreach ($item in $salida) {
                 if ($item.Materia -eq $id) {
@@ -283,6 +303,8 @@ foreach ($reg in $registro) {
                     break
                 }
             }
+
+            # Si no tengo la materia en el array de salida, la agrego
 
             if ($esNuevo) {
                 $materia.Final++

@@ -5,7 +5,7 @@
 # Nombre del script: Ejercicio2
 # Trabajo practico: 1
 # Ejercicio: 2
-# Entrega: 3ra
+# Entrega: 5ta
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
