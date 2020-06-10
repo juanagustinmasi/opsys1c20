@@ -5,7 +5,7 @@
 # Nombre del script: demonio
 # Trabajo practico: 1
 # Ejercicio: 3
-# Entrega: 1ra entrega
+# Entrega: 5ta
 # Integrantes:
 #	    Daiana Gomez Nespola, DNI 38005120
 #	    Juan Masi, DNI 37981647
