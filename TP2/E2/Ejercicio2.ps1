@@ -45,7 +45,7 @@ gci $Path -File | Where-Object {$_.length -gt 0} | ForEach-Object {
 
     $textoArchivo =$(Get-Content $_.FullName | %{
         New-Object psobject -Property @{
-            Fecha = ($_).Split("_")[0].Trim(" ")
+            Fecha = Get-Date -Date ($_).Split("_")[0].Trim(" ")
             Usuario = ($_).Split("_")[1].Trim(" ")
         }
     })
@@ -55,10 +55,10 @@ gci $Path -File | Where-Object {$_.length -gt 0} | ForEach-Object {
         if( ($i % 2) -ne 0 ) {
             #comienza la llamada
             $usuario=$_.Usuario
-            $inicioLlamada=Get-Date -Date $_.Fecha
+            $inicioLlamada=$_.Fecha
         }else{
             #termina la llamada
-            $finllamada=Get-Date -Date $_.Fecha
+            $finllamada=$_.Fecha
             $dia=Get-Date -Date $inicioLlamada -Format "dd-MM-yyyy"
             
             $obj = New-Object -TypeName psobject
