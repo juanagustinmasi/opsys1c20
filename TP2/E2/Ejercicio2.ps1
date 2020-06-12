@@ -21,7 +21,7 @@
 	    Damian Perez, DNI 35375255
     
     Ejercicio2.ps1 - TP N°2 - PowerShell -  Ejercicio 2
-    Entrega N° 1 
+    Entrega N° 4
 
 #>
 Param (
