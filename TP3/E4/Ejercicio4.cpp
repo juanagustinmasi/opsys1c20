@@ -1,7 +1,7 @@
 //  -----------------------ENCABEZADO------------------------------------------------------------------------
 
 //  Trabajo practico: 3
-//  Ejercicio: 1
+//  Ejercicio: 4
 //  Entrega: 1ra
 //  Integrantes:
 // 	    Daiana Gomez Nespola, DNI 38005120
