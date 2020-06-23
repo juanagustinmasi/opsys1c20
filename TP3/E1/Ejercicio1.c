@@ -1,3 +1,17 @@
+//  -----------------------ENCABEZADO------------------------------------------------------------------------
+
+//  Trabajo practico: 3
+//  Ejercicio: 1
+//  Entrega: 1ra
+//  Integrantes:
+// 	    Daiana Gomez Nespola, DNI 38005120
+// 	    Juan Masi, DNI 37981647
+//      Guido Delbo, DNI 36982261
+// 	    Nicolas Fortunato, DNI 37864810
+// 	    Damian Perez, DNI 35375255
+
+//  ----------------------FIN ENCABEZADO---------------------------------------------------------------------
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -233,3 +247,7 @@ void mostrarListaString(const tLista *p)
     }
     printf("\n");
 }
+
+//  ------------------------------FIN------------------------------------------------------------------------
+//  SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+//  ---------------------------------------------------------------------------------------------------------
