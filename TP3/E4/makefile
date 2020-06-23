@@ -1,4 +1,4 @@
-all: Ejercicio2
+all: Ejercicio4
 
 Ejercicio2:
 	g++ Ejercicio4.cpp -lpthread -o Ejercicio4.exe
