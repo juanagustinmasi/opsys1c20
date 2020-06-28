@@ -30,17 +30,18 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <typeinfo>
 #include <regex>
 
-#define MAXVAL 12
+#define MAXVAL 1000
 #define TODO_OK 1
 #define ERROR 0
 #define OVERFLOW -1
 
 using namespace std;
 
-int AcumSumaSucesion[MAXVAL];
-long long AcumSumaProd[2] = {0, 1};
+double AcumSumaSucesion[MAXVAL];
+long double AcumSumaProd[2] = {0, 1};
 
 void mostrar_ayuda()
 {       
@@ -65,9 +66,9 @@ public:
     // Destructor
     ~HiloFibonacci() {}
 
-    int getSumaSucesion()
+    double getSumaSucesion()
     {
-        int resultado = 1,
+        double resultado = 1,
             ant = 0,
             sig = 0,
             sum = 1;
@@ -108,25 +109,40 @@ void HiloProducto(int num)
 int main(int argc, char const *argv[])
 {
     /******************************* VALIDACIONES ****************************************************/
-    if (argc == 2 &&  strcmp(argv[1], "-help") == 0 || (strcmp(argv[1], "-?") == 0 || strcmp(argv[1], "-h") == 0 ))
-    {
-        mostrar_ayuda();
-        return TODO_OK;
-    }
-    if (argc != 3)
-    {
+    
+    if(argc == 0 || argv[1] == NULL || argc != 3){  /* solucion segmentation fault por param */
         cout << "\033[1;31m ERROR_CANTIDAD_PARAMETROS \033[0m\n" << endl;
         mostrar_ayuda();
         return ERROR;
     }
-    if (strcmp(argv[1], "-N") != 0)
+    
+
+    if (argc == 2 && !argv[1] || strcasecmp(argv[1], "-help") == 0 || (strcmp(argv[1], "-?") == 0 || strcasecmp(argv[1], "-h") == 0 ))
+    {
+        mostrar_ayuda();
+        return TODO_OK;
+    }
+
+    if( atoi(argv[2]) >0 ){ 
+
+        int parteEntera = (int)atoi(argv[2]);
+        if (!regex_match(argv[2], regex("([0-9]+)")) || (atof(argv[2]) - parteEntera != 0) ){  /*chequeo que no se pase algo distinto a entero por param*/
+        cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
+        cout << "El segundo parametro esperado es un valor entero positivo sin decimales ni letras" << endl;
+        cout << endl;
+        mostrar_ayuda();
+        return ERROR;
+        }
+    }
+
+    if (strcasecmp(argv[1], "-N") != 0)
     {
         cout << "\033[1;31m ERROR_EN_PRIMER_PARAMETRO \033[0m\n" << endl;
         cout << "Se esperaba recibir -N" << endl;
         mostrar_ayuda();
         return ERROR;
     }
-    if(!(atoi(argv[2]) >=0) && atoi(argv[2]) <= MAXVAL){
+    if(!(atoi(argv[2]) >=0) && atoi(argv[2]) <= MAXVAL ){
         cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
         cout << "El segundo parametro esperado es un valor entero positivo" << endl;
         cout << endl;
@@ -142,7 +158,7 @@ int main(int argc, char const *argv[])
         cout << "Por favor revisar ayuda" << endl;
         cout << endl;
         mostrar_ayuda();
-        return EXIT_FAILURE;
+        return ERROR;
     }
     if (numParam > MAXVAL)
     {   
@@ -172,7 +188,8 @@ int main(int argc, char const *argv[])
 
     cout << AcumSumaProd[1] - AcumSumaProd[0] << endl;
 
-    return EXIT_SUCCESS;
+    return TODO_OK;
+    exit(1);
 }
 
 
