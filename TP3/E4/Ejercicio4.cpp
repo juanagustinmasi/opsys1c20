@@ -28,7 +28,6 @@
 #include <thread>
 #include <unistd.h>
 #include <fstream>
-#include <regex>
 
 using namespace std;
 
@@ -175,7 +174,6 @@ void controlaProcesos(int valorLimiteCPU, int valorLimiteMEM)
                     strcpy(datosProceso.nombre, proceso.nombre.c_str());
                     datosProceso.pid = proceso.pid;
 
-                    // escribir fifo
                     write(punteroEscritura, &datosProceso, sizeof(datosProceso));
                 }
             }
@@ -205,22 +203,18 @@ void registraProcesos()
     mkfifo("./fifo", 0666);
     int punteroLectura = open("./fifo", O_RDONLY);
 
-    // leer fifo
     read(punteroLectura, &datosProceso, sizeof(datosProceso));
 
     while (ejecuta)
     {
         mensaje = datosProceso.tipoExceso == 1 ? "Supera CPU" : datosProceso.tipoExceso == 2 ? "Supera memoria" : "Supera ambos";
 
-        // escribir archivo
         archivoSalida << datosProceso.hora << " "
                 << "${" << datosProceso.pid << "}: " << mensaje << " " << datosProceso.nombre << "." << endl;
 
-        // leer fifo
         read(punteroLectura, &datosProceso, sizeof(datosProceso));
     }
 
-    //cierro
     close(punteroLectura);
     archivoSalida.close();
 }
@@ -234,21 +228,18 @@ void signal_handler(int signal_num)
 // Ayuda
 void mostrar_ayuda()
 {
-    cout << "El script detecta fugas de memoria, excesiva utilización de CPU o ambas por parte de los procesos" << endl;
-	cout << "Para esto un proceso Control verifica mediante valores limites pasados, si algun proceso tiene algun exceso" << endl;
-    cout << "Se deben pasar los valores límites por parámetro." << endl;
-    cout << "El script recibe como parametro: los limites separados por espacio [Valor entero ente 0 y 100]" << endl;
+    cout << "Este programa verifica la utilización de memoria y CPU de los procesos corriendo en el sistema" << endl;
+	cout << "Para esto un proceso Control verifica mediante valores limites recibidos por parámetro, si algun proceso los sobrepasa" << endl;
 	cout << "Una vez detectado el exceso a treves de un FIFO se le pasa los datosProceso a un proceso Registro"<< endl;
 	cout << "El proceso Registro recibirá los datos de los proceso y los registrará en un archivo "<< endl;
 	cout << "Se creara un archivo.txt llamado InformaProcesos.txt donde se guardara los datos"<< endl;
     cout << "" << endl;
-    cout << "---------------------------------------------------------------------------------------" << endl;
-    cout << "SINTAXIS:" << endl;
-    cout << "./Source.exe [CPU_LIMITE] [MEMORIA_LIMITE]" << endl;
     cout << "" << endl;
-    cout << "---------------------------------------------------------------------------------------" << endl;
-    cout << "Ejecutar previamente \"makefile\" para compilar el archivo" << endl;
-    cout << "Para detener el proceso principal utilizar \"kill -10 <PID>\"" << endl;
+    cout << "SINTAXIS:" << endl;
+    cout << "./Ejercicio4 [CPU_LIMITE] [MEMORIA_LIMITE]" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+    cout << "El proceso principal se detiene con:  \"kill -10 <PID>\"" << endl;
     cout << "" << endl;
 }
 
@@ -264,22 +255,23 @@ int main(int argc, char *argv[])
 
     if (argc != 3)
     {
-        cout << "El numero de parametros es incorrecto" << endl;
+        cout << "Parámetros no válidos" << endl;
+        cout << "Consulte la ayuda con: -help, -h ó -?" << endl;
         return EXIT_FAILURE;
     }
 
-    if (!regex_match(argv[1], regex("([0-9]+)")))
+    if (!(atoi(argv[1]) >= 0 && atoi(argv[1]) <= 100))
     {
-        cout << "El primer parametro es erroneo" << endl;
-        cout << "El primer parametro debe ser: [Un valor entero entre 0 y 100]" << endl;
+        cout << "El primer parámetro es erroneo" << endl;
+        cout << "Ingrese un valor numérico entero entre 0 y 100" << endl;
         cout << "" << endl;
         return EXIT_FAILURE;
     }
 
-    if (!regex_match(argv[2], regex("([0-9]+)")))
+    if (!(atoi(argv[2]) >= 0 && atoi(argv[2]) <= 100))
     {
-        cout << "El segundo parametro es erroneo" << endl;
-        cout << "El segundo parametro debe ser: [Un valor entero entre 0 y 100]" << endl;
+        cout << "El segundo parámetro es erroneo" << endl;
+        cout << "Ingrese un valor numérico entero entre 0 y 100" << endl;
         cout << "" << endl;
         return EXIT_FAILURE;
     }
@@ -289,22 +281,20 @@ int main(int argc, char *argv[])
 
     if (valorLimiteCPU < 0 || valorLimiteCPU > 100 || valorLimiteMEM < 0 || valorLimiteMEM > 100)
     {
-        cout << "Error en los valores de los parametros" << endl;
-        cout << "Los valores esperados de los parametros son: [Valor Entero entre 0 y 100]" << endl;
+        cout << "Parámetros no válidos" << endl;
+        cout << "Ingrese un valor numérico entero entre 0 y 100" << endl;
         cout << "" << endl;
         return EXIT_FAILURE;
     }
 
     pid_t pid = fork();
 
-    //Valido que se creo bien el proceso hijo
     if (pid < 0)
     {
-        printf("Error al querer crear un proceso hijo.\n");
+        printf("Error creando un proceso hijo.\n");
         exit(1);
     }
 
-    //Verifico que estoy en el padre. Mato al proceso padre.
     if (pid > 0)
     {
         exit(1);
@@ -323,4 +313,6 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-// +++++++++++++++FIN DE ARCHIVO+++++++++++++++++++++++
+//  ------------------------------FIN------------------------------------------------------------------------
+//  SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+//  ---------------------------------------------------------------------------------------------------------
