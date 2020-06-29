@@ -1,0 +1,8 @@
+18152152;Lunes
+10369235;Martes
+20452452;Miercoles
+93563563;Sabado
+9486486;Martes
+39569569;Miercoles
+20512052;Viernes
+44258258;Jueves
