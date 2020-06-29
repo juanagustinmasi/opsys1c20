@@ -50,29 +50,36 @@ int main(int argc, char *argv[])
 
     t_asistencia_pago *pMemComp = (t_asistencia_pago *)shmat(shmid, NULL, 0); // asigna la memoria compartida a la estructura
     
-    FILE *archBD=fopen(ARCHIVO_ASISTENCIA, "r");
+    FILE *archBD=fopen(ARCHIVO_ASISTENCIAS, "r");
     if( archBD == NULL)
     {
         printf("Error al acceder al archivo de asistencias\n");
         exit(ERROR_ARCHIVO);
     }
-    printf ("productor 1\n");
+
     //Utiliza la Memoria compartida
     while( !feof(archBD) )
     {
-        printf ("productor 1.1");
         sem_wait(semAsist);
         sem_wait(M);
-        fscanf(archBD,"%ld;%s",&(*pMemComp).dni,(*pMemComp).diaAsistencia);
-        printf ("productor 1.1 %ld\n", pMemComp->dni);
+        fflush(stdin);
+        fscanf(archBD,"%ld;%s\n",&(*pMemComp).dni,(*pMemComp).diaAsistencia);
+
         pMemComp->fechapago.anio=0;
 		pMemComp->fechapago.mes=0;
 		pMemComp->fechapago.dia=0;
+        strcpy(pMemComp->observaciones, "");
+
         sem_post(M);
         sem_post(hayMemoriaParaLeer);
     }
-printf ("productor 2\n");
     fclose(archBD);
+
+    sem_wait(semAsist);
+    sem_wait(M);
+    strcpy(pMemComp->observaciones, FIN_ARCHIVO_ASISTENCIAS);
+    sem_post(M);
+    sem_post(hayMemoriaParaLeer);
 
     sem_post(confirmaProdAsistencias);
 
