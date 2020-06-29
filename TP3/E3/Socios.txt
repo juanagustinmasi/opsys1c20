@@ -1,0 +1,9 @@
+Micaela;Gomez;18152152;Futbol;Lunes
+Nicolas;Lugos;10369235;Voley;Martes
+Jazmin;Romero;20452452;Basquet;Viernes
+Ricardo;Gomez;93563563;Natacion;Sabado
+Martin;Perez;9486486;Futbol;Miercoles
+Micaela;Perez;39569569;Futbol;Miercoles
+Gaston;Gonzalez;20512052;Basquet;Viernes
+Raquel;Gutierrez;44258258;Voley;Jueves
+Ramon;Jimenez;46336236;Voley;Jueves
