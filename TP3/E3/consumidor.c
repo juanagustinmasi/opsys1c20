@@ -77,11 +77,10 @@ int main(int argc, char *argv[])
     sem_post(semPagos);
     sem_post(M);/// V(M) Inicializa en 1 para los productores
     
-    int x = 0; 
     int finArchPagos = 0;
     int finArchAsistencias =0;
 
-    while(x <= (CANT_MAX_SOCIOS*2)){  
+    while(!(finArchPagos == 1 && finArchAsistencias == 1)){  
         sem_wait(hayMemoriaParaLeer);
         sem_wait(M);   
         //Se informo el fin de alguno de los archivos
@@ -118,12 +117,6 @@ int main(int argc, char *argv[])
             }
         }
         sem_post(M);
-
-        if(finArchPagos == 1 && finArchAsistencias == 1){
-            break;
-        }
-
-        x--;
     }
     //REALIZA LOS CALCULOS Y MUESTRA POR PANTALLA
     sem_wait(confirmaProdPagos);
