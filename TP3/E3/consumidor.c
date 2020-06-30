@@ -68,7 +68,8 @@ int main(int argc, char *argv[])
     t_socio sociosArray[CANT_MAX_SOCIOS];
 
     int i = 0;
-    while( fscanf(archBD,"%[^;];%[^;];%ld;%[^;];%[^\n]",sociosArray[i].nombre,sociosArray[i].apellido,&sociosArray[i].dni,sociosArray[i].deporte,sociosArray[i].diaInscripto) != EOF)
+    fflush(stdin);
+    while( fscanf(archBD,"%[^;];%[^;];%ld;%[^;];%s\n",sociosArray[i].nombre,sociosArray[i].apellido,&sociosArray[i].dni,sociosArray[i].deporte,sociosArray[i].diaInscripto) != EOF)
 	{
         i++;
     }
@@ -76,23 +77,51 @@ int main(int argc, char *argv[])
     sem_post(semPagos);
     sem_post(M);/// V(M) Inicializa en 1 para los productores
     
-    int x = 16; //Es la cantidad de registros entre el archivo de pagos y de asistencias no se como cortarlo antes
+    int x = 0; 
+    int finArchPagos = 0;
+    int finArchAsistencias =0;
 
-    while(x > 0){        
+    while(x <= (CANT_MAX_SOCIOS*2)){  
         sem_wait(hayMemoriaParaLeer);
-        sem_wait(M);
-        if(strcmp(pMemComp->diaAsistencia,"")==0){
-            //Se guardo un pago
-            actualiza_pago(sociosArray, pMemComp->dni, pMemComp->fechapago);
-            //activo el prod de assistencias
-            sem_post(semAsist);
-        }else{
-            //Se guardo una asistencia
-            actualiza_asistencia(sociosArray, pMemComp->dni, pMemComp->diaAsistencia);
-            //Activo el prod de pagos
+        sem_wait(M);   
+        //Se informo el fin de alguno de los archivos
+        if(strcmp(pMemComp ->observaciones, FIN_ARCHIVO_ASISTENCIAS)== 0){
+            finArchAsistencias = 1;
             sem_post(semPagos);
         }
+        else{
+            if(strcmp(pMemComp ->observaciones, FIN_ARCHIVO_PAGOS)== 0){
+                finArchPagos = 1;
+                sem_post(semAsist);
+            }
+        }
+
+        if(strcmp(pMemComp->observaciones,"")==0){
+            //Si ya se termino de leer uno de los archivos, deberia de activar el otro para que no se quede esperando
+            if(finArchPagos == 1 && finArchAsistencias == 0){
+                sem_post(semAsist);
+            }
+            if(finArchPagos == 0 && finArchAsistencias == 1){
+                sem_post(semPagos);
+            }
+
+            if(strcmp(pMemComp->diaAsistencia,"")==0){
+                //Se guardo un pago
+                actualiza_pago(sociosArray, pMemComp->dni, pMemComp->fechapago);
+                //activo el prod de assistencias
+                sem_post(semAsist);
+            }else{
+                //Se guardo una asistencia
+                actualiza_asistencia(sociosArray, pMemComp->dni, pMemComp->diaAsistencia);
+                //Activo el prod de pagos
+                sem_post(semPagos);
+            }
+        }
         sem_post(M);
+
+        if(finArchPagos == 1 && finArchAsistencias == 1){
+            break;
+        }
 
         x--;
     }
@@ -103,21 +132,23 @@ int main(int argc, char *argv[])
     float montoTotal = 0;
     
     printf("**  Informes obtenidos:  **\n");
+    printf("\n");
     for (int y = 0; y < i; y++)
     {
         montoTotal+=sociosArray[y].pago.montoPagado;
-        if(strcmp(sociosArray[y].diaInscripto, sociosArray[y].asistencia.diaAsistencia ) != 0){
-            printf("El socio %s %s con DNI: %ld asistio el dia %s y no le correspondia\n", sociosArray[y].nombre, sociosArray[y].apellido, sociosArray[y].dni, sociosArray[y].asistencia.diaAsistencia);
+        //puede haber socios que no tengan asistencias
+        if(sociosArray[y].asistencia.diaAsistencia != NULL && strcmp(sociosArray[y].asistencia.diaAsistencia, "") != 0 && strcmp(sociosArray[y].diaInscripto, sociosArray[y].asistencia.diaAsistencia ) != 0){
+            printf("El socio %s %s con DNI: %ld asistio el dia %s en lugar de %s a %s.\n", sociosArray[y].nombre, sociosArray[y].apellido, sociosArray[y].dni, sociosArray[y].asistencia.diaAsistencia, sociosArray[y].diaInscripto, sociosArray[y].deporte);
         }
     }
-
+    printf("\n");
     for (int y = 0; y < i; y++)
     {
         if(sociosArray[y].pago.montoPagado == 0){
             printf("El socio %s %s con DNI: %ld no abono la cuota del mes.\n", sociosArray[y].nombre, sociosArray[y].apellido, sociosArray[y].dni);
         }
     }
-   
+    printf("\n");
     printf("** Monto Total cobrado en el mes: $%.2f **\n",montoTotal);
 
     // libera los recursos

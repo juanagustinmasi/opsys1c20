@@ -33,7 +33,7 @@ typedef struct
     char nombre[50];
     char apellido[50];
     char deporte[20];
-    char diaInscripto[20]; 
+    char diaInscripto[10]; 
     long dni; 
     t_pago pago;
     t_asistencia asistencia;
@@ -44,6 +44,7 @@ typedef struct
     long dni;
     char diaAsistencia[10];
     t_fecha fechapago;
+    char observaciones[20];
 } t_asistencia_pago;
 
 
@@ -56,8 +57,10 @@ typedef struct
 #define DNI_NO_ENCONTRADO -2
 #define ARCHIVO_SOCIOS  "Socios.txt"
 #define ARCHIVO_PAGOS  "Pagos.txt"
-#define ARCHIVO_ASISTENCIA  "Asistencia.txt"
+#define ARCHIVO_ASISTENCIAS  "Asistencia.txt"
 #define CANT_MAX_SOCIOS     50
+#define FIN_ARCHIVO_ASISTENCIAS  "FIN-ASISTENCIA"
+#define FIN_ARCHIVO_PAGOS  "FIN-PAGOS"
 
 int actualiza_pago(t_socio arraySocios[CANT_MAX_SOCIOS], long dni, t_fecha fecha){
     for (int i = 0; i < CANT_MAX_SOCIOS; i++)

@@ -56,21 +56,29 @@ int main(int argc, char *argv[])
         printf("Error al acceder al archivo de pagos\n");
         exit(ERROR_ARCHIVO);
     }
-    printf ("productor 1\n");
     
     //Utiliza la Memoria compartida
     while( !feof(archBD) )
     {
         sem_wait(semPagos);
         sem_wait(M);
-        fscanf(archBD,"%ld;%04d-%02d-%02d",&(*pMemComp).dni,&(*pMemComp).fechapago.anio,&(*pMemComp).fechapago.mes,&(*pMemComp).fechapago.dia);
-        printf ("productor 1.1 %ld\n", pMemComp->dni);
+        fflush(stdin);
+        fscanf(archBD,"%ld;%04d-%02d-%02d\n",&(*pMemComp).dni,&(*pMemComp).fechapago.anio,&(*pMemComp).fechapago.mes,&(*pMemComp).fechapago.dia);
+
         strcpy(pMemComp->diaAsistencia, "");
+        strcpy(pMemComp->observaciones, "");
+
         sem_post(M);
         sem_post(hayMemoriaParaLeer);
     }
-printf ("productor 2\n");
+
     fclose(archBD);
+
+    sem_wait(semPagos);
+    sem_wait(M);
+    strcpy(pMemComp->observaciones, FIN_ARCHIVO_PAGOS);
+    sem_post(M);
+    sem_post(hayMemoriaParaLeer);
 
     sem_post(confirmaProdPagos);
 
