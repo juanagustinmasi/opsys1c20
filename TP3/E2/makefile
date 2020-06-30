@@ -1,7 +1,5 @@
-all: Ejercicio2
-
-Ejercicio2:
+make:
 	g++ Ejercicio2.cpp -lpthread -o Ejercicio2
 
 clean:
-	rm Ejercicio2.exe
+	rm Ejercicio2

@@ -1,10 +1,9 @@
-
 /*-----------------------ENCABEZADO------------------------------------------------------------------------
 
- Nombre del script: Ejercicio6.cpp
+ Nombre del script: Ejercicio2.cpp
  Trabajo practico: 3
  Ejercicio: 2
- Entrega: 1ra
+ Entrega: 2ra
  Integrantes:
 	    Daiana Gomez Nespola, DNI 38005120
 	    Juan Masi, DNI 37981647
@@ -38,23 +37,10 @@
 using namespace std;
 
 double AcumSumaSucesion[MAXVAL];
-long double AcumSumaProd[2] = {0, 1};
+double AcumSumaProd[2] = {0, 1};
 
-void mostrar_ayuda()
-{       
-    cout << "\033[1;32m_______________________________________________________________________\033[0m\n"<<endl;
-    cout << "\033[1;32mScript Investigadores, sucesión de Fibonacci con Hilos\033[0m\n" << endl;
-    cout << "\033[1;32mEl script recibe como parametro: -N (Entero Positivo)\033[0m\n" << endl;
-    cout << endl;
-    cout << "\033[1;32m.Ejemplo:\033[0m\n" << endl;
-    cout << "\033[1;32m./Ejercicio2 -N (Entero Positivo)\033[0m\n" << endl;
-    cout << endl;
-    cout << "\033[1;32m________________________________________________________________________\033[0m\n" << endl;
-    cout << endl;
-}
-
-class HiloFibonacci
-{
+ 
+class HiloFibonacci{
     int numero;
 
 public:
@@ -63,8 +49,7 @@ public:
     // Destructor
     ~HiloFibonacci() {}
 
-    double getSumaSucesion()
-    {
+    double getSumaSucesion(){
         double resultado = 1,
             ant = 0,
             sig = 0,
@@ -81,90 +66,86 @@ public:
     }
 };
 
-void Hilo(int idThread)
-{
+void Hilo(int idThread){
+    
     HiloFibonacci hf(idThread);
     AcumSumaSucesion[idThread - 1] = (hf.getSumaSucesion() * 1);
 }
 
-void HiloSuma(int num)
-{
-    for (int i = 0; i < num ; i++)
-    {
-        AcumSumaProd[0] +=  AcumSumaSucesion[i];
-    }
-}
+void HiloSuma(int num){ for (int i = 0; i < num ; i++) AcumSumaProd[0] +=  AcumSumaSucesion[i];}
 
-void HiloProducto(int num)
-{
-    for (int i = 0; i < num ; i++)
-    {
-        AcumSumaProd[1] *=  AcumSumaSucesion[i];
-    }
-}
+void HiloProducto(int num){ for (int i = 0; i < num ; i++) AcumSumaProd[1] *=  AcumSumaSucesion[i]; }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]){
     /******************************* VALIDACIONES ****************************************************/
-    
-    if(argc == 0 || argv[1] == NULL || argc != 3){  /* solucion segmentation fault por param */
-        cout << "\033[1;31m ERROR_CANTIDAD_PARAMETROS \033[0m\n" << endl;
-        mostrar_ayuda();
-        return ERROR;
-    }
-    
 
-    if (argc == 2 && !argv[1] || strcasecmp(argv[1], "-help") == 0 || (strcmp(argv[1], "-?") == 0 || strcasecmp(argv[1], "-h") == 0 ))
-    {
-        mostrar_ayuda();
-        return TODO_OK;
-    }
 
-    if( atoi(argv[2]) >0 ){ 
 
-        int parteEntera = (int)atoi(argv[2]);
-        if (!regex_match(argv[2], regex("([0-9]+)")) || (atof(argv[2]) - parteEntera != 0) ){  /*chequeo que no se pase algo distinto a entero por param*/
-        cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
-        cout << "El segundo parametro esperado es un valor entero positivo sin decimales ni letras" << endl;
-        cout << endl;
-        mostrar_ayuda();
-        return ERROR;
+    if(argc == 2){
+
+        if( strcasecmp(argv[1], "-help") == 0 || strcmp(argv[1], "-?") == 0 || strcasecmp(argv[1], "-h") == 0 ){
+            cout << "\033[1;32m_______________________________________________________________________\033[0m\n"<<endl;
+            cout << "\033[1;32mScript Investigadores, sucesión de Fibonacci con Hilos\033[0m\n" << endl;
+            cout << "\033[1;32mEl script recibe como parametro: -N (Entero Positivo)\033[0m\n" << endl;
+            cout << endl;
+            cout << "\033[1;32m.Ejemplo:\033[0m\n" << endl;
+            cout << "\033[1;32m./Ejercicio2 -N (Entero Positivo)\033[0m\n" << endl;
+            cout << endl;
+            cout << "\033[1;32m________________________________________________________________________\033[0m\n" << endl;
+            return TODO_OK;
         }
+        else{
+            
+            cout << "\033[1;31m Ha ocurrido un error. Por favor revisar ayuda con -h -help o -? \n\n \033[0m\n" << endl;
+            return ERROR;
+        }
+        
     }
+    else if (argc == 3){ 
+        if (strcasecmp(argv[1], "-N") != 0){
+            cout << "\033[1;31m ERROR_EN_PRIMER_PARAMETRO \033[0m\n" << endl;
+            cout << "Se esperaba recibir -N" << endl;
+            cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
+            return ERROR;
+        }
 
-    if (strcasecmp(argv[1], "-N") != 0)
-    {
-        cout << "\033[1;31m ERROR_EN_PRIMER_PARAMETRO \033[0m\n" << endl;
-        cout << "Se esperaba recibir -N" << endl;
-        mostrar_ayuda();
-        return ERROR;
+        if (!regex_match(argv[2], regex("([0-9]+)")) ){  /*chequeo que no se pase algo distinto a entero por param*/
+            cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
+            cout << "El segundo parametro esperado es un valor entero positivo sin decimales ni letras" << endl;
+            cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
+            return ERROR;
+        }
+        
+        if(!(atoi(argv[2]) >=0) && atoi(argv[2]) <= MAXVAL ){
+            cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
+            cout << "El segundo parametro esperado es un valor entero positivo \n" << endl;
+            cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
+            return ERROR;
+        }
+
+    } else {    
+        if(argc == 0 || argv[1] == NULL){  /* solucion segmentation fault por param */
+            cout << "\033[1;31m ERROR_CANTIDAD_PARAMETROS \033[0m\n" << endl;
+            cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
+            return ERROR;
+        }
+  
     }
-    if(!(atoi(argv[2]) >=0) && atoi(argv[2]) <= MAXVAL ){
+    
+    int numParam = atoi(argv[2]);
+
+    if (numParam == 0){
         cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
-        cout << "El segundo parametro esperado es un valor entero positivo" << endl;
-        cout << endl;
-        mostrar_ayuda();
+        cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
         return ERROR;
     }
-
-    unsigned int numParam = atoi(argv[2]);
-
-    if (numParam == 0)
-    {
-        cout << "\033[1;31m ERROR_EN_SEGUNDO_PARAMETRO \033[0m\n" << endl;
-        cout << "Por favor revisar ayuda" << endl;
-        cout << endl;
-        mostrar_ayuda();
-        return ERROR;
-    }
-    if (numParam > MAXVAL)
-    {   
+    if (numParam > MAXVAL){   
         cout << "\033[1;31m STACK_OVERFLOW \033[0m\n"<< endl;
         cout << "Segundo parametro debe ser menor a " << MAXVAL << endl;
-        mostrar_ayuda();
+        cout << "Por favor revisar ayuda con -h -help o -? \n\n" << endl;
         return OVERFLOW;
     }
-    
+  
 /*******************************************FIN VALIDACIONES***************************************/
 
     thread thSumaSucesion[numParam];
@@ -184,9 +165,10 @@ int main(int argc, char const *argv[])
     thProducto.join();
 
     cout << AcumSumaProd[1] - AcumSumaProd[0] << endl;
-
+    
     return TODO_OK;
     exit(1);
+    
 }
 
 
