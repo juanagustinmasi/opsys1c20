@@ -1,83 +1,93 @@
+/*-----------------------ENCABEZADO------------------------------------------------------------------------
+
+ Nombre del programa: funciones.h
+ Trabajo practico: 3
+ Ejercicio: 5
+ Entrega: 3ra
+ Integrantes:
+	    Daiana Gomez Nespola, DNI 38005120
+	    Juan Masi, DNI 37981647
+        Guido Delbo, DNI 36982261
+	    Nicolas Fortunato, DNI 37864810
+	    Damian Perez, DNI 35375255
+
+ ----------------------FIN ENCABEZADO---------------------------------------------------------------------*/
+
+
 #ifndef FUNCIONES_H_
 #define FUNCIONES_H_
-#include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <sys/shm.h>
-#include <semaphore.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <sys/ipc.h>
 #include <signal.h>
 #include <ctype.h>
 #include <pthread.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <dirent.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/ipc.h>
+#include <dirent.h>
+#include <sys/ioctl.h>
+#include <netdb.h>
 #include <ifaddrs.h>
 
-#define LOG_FILE "./logFile.txt"
-#define DIR_ASISTENCIA "./Asistencias/"
-
-#define TAM_QUERY 250
-#define MAX_QUEUE 10
-#define INICIADO 1
-#define NO_ENCONTRADO 0
-
-typedef struct {
-	
-	char usuario[30];
-	char password[30];
-	
-} t_usuario;
+#define TRUE 1
+#define FALSE 0
+#define FIN "FIN"
+#define ERROR "ERROR"
+#define ERROR_ARCHIVO_USUARIOS 11
+#define ERROR_IP 12
+#define ERROR_SOCKET 13
+#define ERROR_PARAMETROS 14
 
 typedef struct {
-	char nombre[30];
-	char password[30];
+	char nombre[50];
+	char clave[50];
 	char rol[2];
 	int cod_comision;
-	
-} t_datos;
+} tInfo;
 
 typedef struct {
-    char nombre[30];
+    char nombre[50];
     char asistencia[2];
-} t_asistencia;
+} tAsistencia;
 
 typedef struct {
-	
-	int operacion;
-	char linea[100];
-	
-} t_request;
+	char usuario[50];
+	char clave[50];
+} tUsuario;
 
-int creacionSocket(int *serverSocket, int *habilitar);
-int comprobacionBD(char *path);
-struct sockaddr_in configuracionSocket;
-int bindListen(int *serverSocket);
-void set(const char *ip, const char *puerto);
+typedef struct {
+	int codigo;
+	char dato[100];
+} tInfoSocket;
 
-void *obtenerQuery(void *sockfd);
-int iniciarSesion(FILE *arch, int socketCliente, t_usuario *query, t_datos *registro);
-void operaciones(FILE *arch, int socketCliente, t_request *query, t_datos *usuarioLoggeado);
-void enviarMensaje(const char *mensaje, int socketCliente, char *tamPaquete);
-int obtenerComision(char *nombreArch);
-void calcularPorcentaje(char *nomArchivo, float *presente, float *ausente, t_datos *usuarioLoggeado);
-void mostrarYGuardarMSJ(char *msj);
-void aceptarRequests(pthread_t *tid, int *socketCliente, int *serverSocket, struct sockaddr_in *ca, socklen_t *cl);
+char archivoUsuarios[500];
 
-void sendMsg(const char *, char *, sem_t *, sem_t *, sem_t *);
-int obtenerIP(char * ip);
-void signal_handler(int sig);
+void grabarLog(char *nombreArchivo, char *msg);
+int loguea(FILE *arch, int socketCliente, tUsuario *info, tInfo *registro);
+int existeArchivoUsuarios(char *path);
+void recibeConexion(pthread_t *thread, int *socketCliente, int *serverSocket, struct sockaddr_in *addr, socklen_t *addrlen);
+void *recibeConsulta(void *sockfd);
+void procesaConsulta(FILE *arch, int socketCliente, tInfoSocket *info, tInfo *usuarioActual);
+void enviaAlSocket(const char *mensaje, int socketCliente, char *tamMsg);
+int parseaComision(char *nombreArchivo);
+void calcularPorcentaje(char *nombreArchivo, float *presente, float *ausente, tInfo *usuarioActual);
+void imprimirMsg(char *msg);
+int ipConfig(char * ip);
+void terminarProceso();
 
-void log_message(char *filename, char *message);
 #endif
+
+/*
+# ------------------------------------FIN -----------------------------------------------------------------#
+# SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+# ---------------------------------------------------------------------------------------------------------# 
+*/

@@ -1,9 +1,9 @@
 /*-----------------------ENCABEZADO------------------------------------------------------------------------
 
- Nombre del script: Ejercicio6.cpp
+ Nombre del programa: cliente.c
  Trabajo practico: 3
  Ejercicio: 5
- Entrega: 1ra
+ Entrega: 3ra
  Integrantes:
 	    Daiana Gomez Nespola, DNI 38005120
 	    Juan Masi, DNI 37981647
@@ -11,424 +11,307 @@
 	    Nicolas Fortunato, DNI 37864810
 	    Damian Perez, DNI 35375255
 
- ----------------------FIN ENCABEZADO---------------------------------------------------------------------
+ ----------------------FIN ENCABEZADO---------------------------------------------------------------------*/
 
- --------------------------SCRIPT-------------------------------------------------------------------------*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
+#define FIN "FIN"
+#define ERROR "ERROR"
+#define ERROR_PARAMETROS 11
+#define ERROR_SOCKET 12
 
-#include "funciones.h"
-
-char respuesta[TAM_QUERY];
-
-int socketCliente;
-
-int longitud;
-
-t_request query;
-
-t_usuario usuario;
-
-void salir()
+typedef struct
 {
-  
+	char usuario[50];
+	char clave[50];
+} tUsuario;
 
-	printf("Finalizando el proceso, Por favor espere...");
+typedef struct
+{
+	int codigo;
+	char dato[100];
+} tInfoSocket;
 
-	for(int i = 0;i < 2; i++){
-        printf(".");
-		sleep(3);
-	}
+struct sockaddr_in listenAddress;
+char *token, c, rol[10], respuesta[200];
+char delim[] = "=\n";
+int socketCliente, tamanioRespuesta, comision;
+tInfoSocket info;
+tUsuario usuario;
 
-	 printf("\n");
-
-	query.operacion = 3;
-
-    send(socketCliente, &query, sizeof(t_request), 0);
-
-    close(socketCliente);
-   
-	exit(1);
+void terminarProceso()
+{
+	printf("\nSaliendo...\n");
+	close(socketCliente);
+	exit(0);
 }
 
-
-void set(const char *ip, const char *puerto)
+void mostrarMenu(char *rol, int cod)
 {
-    bzero(&(configuracionSocket.sin_zero), 8);
-    
-	configuracionSocket.sin_family = AF_INET;
-    
-	configuracionSocket.sin_addr.s_addr = inet_addr(ip);
-    
-	configuracionSocket.sin_port = htons(atoi(puerto));
-}
-
-void operaciones(char *rol, int cod){
-	
-	char listaAsistencia[50];
-	char c;
-	
-	if(strcmp(rol, "DOCENTE")==0){
-		
-		if(query.operacion == 1){
-
+	if (strcmp(rol, "DOCENTE") == 0)
+	{
+		if (info.codigo == 1)
+		{
+			printf("\n\n*~*~*~*~*~*~*~*~*~*~*~*~*~*~ Listado de Asistencias *~*~*~*~*~*~*~*~*~*~*~*~*~*~\n\n\n\n");
 			fgetc(stdin);
-
-			printf("\nIngrese fecha con formato YYYY-MM-DD: ");
-			
-			scanf("%[^\n]", query.linea);
-
+			printf("\nIngresar fecha de asistencias (AAAA-MM-DD): ");
+			scanf("%[^\n]", info.dato);
 			fgetc(stdin);
-			
-			send(socketCliente, &query, sizeof(t_request), 0);
-
+			send(socketCliente, &info, sizeof(tInfoSocket), 0);
 			memset(respuesta, 0, strlen(respuesta));
-			
 			recv(socketCliente, respuesta, sizeof(int), 0);
-			
-			longitud = atoi(respuesta);
-			
-			recv(socketCliente, respuesta, longitud, 0);
+			tamanioRespuesta = atoi(respuesta);
+			recv(socketCliente, respuesta, tamanioRespuesta, 0);
 
-			if(strstr(respuesta,"ERROR")!=NULL)
+			if (strstr(respuesta, ERROR) == NULL)
 			{
-				strcpy(respuesta,"ERROR");
-			}
-			
-			if(strcmp(respuesta, "ERROR")!=0){
-
-				sprintf(listaAsistencia, "\nAsistencia Comision: %d\n", cod);
-
-				printf("%s", listaAsistencia);
-
-				while (strcmp(respuesta, "FIN")!=0){
-
-					printf("\t%s",respuesta);
-
+				printf("Listado de asistencias:\n");
+				while (strcmp(respuesta, FIN) != 0)
+				{
+					printf("%s", respuesta);
 					memset(respuesta, 0, strlen(respuesta));
-
 					recv(socketCliente, respuesta, sizeof(int), 0);
-
-					longitud = atoi(respuesta);
-
-					recv(socketCliente, respuesta, longitud, 0);
+					tamanioRespuesta = atoi(respuesta);
+					recv(socketCliente, respuesta, tamanioRespuesta, 0);
 				}
-			}else{
-
-				printf("\nArchivo inexistente");
-			
 			}
-
-			printf("\nPresione cualquier tecla para volver al menu principal\n");
-
-			fflush(stdin);
-
-			scanf("%c",&c);
-
-			system("clear");
-			
-		}
-		
-		if(query.operacion == 2){
-				
-			send(socketCliente, &query, sizeof(t_request), 0); 
-
-			memset(respuesta, 0, strlen(respuesta));
-
-			recv(socketCliente, respuesta, sizeof(int), 0);
-
-			longitud = atoi(respuesta);
-
-			recv(socketCliente, respuesta, longitud, 0);
-
-			if(strstr(respuesta,"ERROR")!=NULL)
+			else
 			{
-				strcpy(respuesta,"ERROR");
+				printf("\nNo se encontraron asistencias para la fecha ingresada.");
 			}
-				
-			if(strcmp(respuesta, "ERROR") != 0){
-				
-				printf("Ingrese la tecla P si está presente o A si está ausente");
-				
-				while (strcmp(respuesta, "FIN")!=0){
-					
-					printf("\nAlumno: %s \n", respuesta);	
-					
-					printf("Ingrese asistencia: ");	
-					
+
+			printf("\nPresione enter para volver.\n");
+			fgetc(stdin);
+			scanf("%c", &c);
+			system("clear");
+		} else
+		{
+			printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~* Carga de Asistencias *~*~*~*~*~*~*~*~*~*~*~*~*~*~*\n\n\n\n");
+
+			send(socketCliente, &info, sizeof(tInfoSocket), 0);
+			memset(respuesta, 0, strlen(respuesta));
+			recv(socketCliente, respuesta, sizeof(int), 0);
+			tamanioRespuesta = atoi(respuesta);
+			recv(socketCliente, respuesta, tamanioRespuesta, 0);
+
+			if (strstr(respuesta, ERROR) == NULL)
+			{
+				while (strcmp(respuesta, FIN) != 0)
+				{
+					printf("Alumno: %s \n", respuesta);
+					printf("Asistencia (P/A): ");
 					fgetc(stdin);
-					
-					scanf("%[^\n]", query.linea);
-					
-					send(socketCliente, &query, sizeof(t_request), 0); 
-					
-					memset(respuesta, 0, strlen(respuesta));
-					
-					recv(socketCliente, respuesta, sizeof(int), 0);
-					
-					longitud = atoi(respuesta);
-					
-					recv(socketCliente, respuesta, longitud, 0);
-				
-				}
-				printf("\nSe ha creado el Archivo asistencias");
-			
-			}else{
+					scanf("%[^\n]", info.dato);
 
-				printf("\nYa se cargo un archivo para la FECHA de hoy\n");
+					send(socketCliente, &info, sizeof(tInfoSocket), 0);
+					memset(respuesta, 0, strlen(respuesta));
+					recv(socketCliente, respuesta, sizeof(int), 0);
+					tamanioRespuesta = atoi(respuesta);
+					recv(socketCliente, respuesta, tamanioRespuesta, 0);
+				}
+			}
+			else
+			{
+				printf("\nEl archivo de asistencias del día de la fecha ya fue cargado.\n");
 			}
 
-			printf("\n\t\tPara volver Presionar cualquier tecla\n");
-			
+			printf("\nPresione enter para volver.\n");
 			fgetc(stdin);
-			
-			scanf("%c",&c);
-
+			scanf("%c", &c);
 			system("clear");
 		}
-			
-		
-	}else {
-		
-		if(strcmp(rol, "ALUMNO")==0){
+	}
+	else
+	{
+		if (strcmp(rol, "ALUMNO") == 0)
+		{
+			if (info.codigo == 1)
+			{
+				printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~ Consulta de Asistencia *~*~*~*~*~*~*~*~*~*~*~*~*~*~\n\n\n\n");
+				fgetc(stdin);
+				printf("\nIngresar fecha de asistencia (AAAA-MM-DD): ");
+				scanf("%[^\n]", info.dato);
+				fgetc(stdin);
+				memset(respuesta, 0, strlen(respuesta));
+				send(socketCliente, &info, sizeof(tInfoSocket), 0);
+				recv(socketCliente, respuesta, sizeof(int), 0);
+				tamanioRespuesta = atoi(respuesta);
+				recv(socketCliente, respuesta, tamanioRespuesta, 0);
+				printf("%s\n\n", respuesta);
 
-			if(query.operacion == 1){
-				
+				printf("Presione enter para volver.\n");
 				fgetc(stdin);
-			
-				printf("\nIngrese la fecha de asistencia con formato YYYY-MM-DD: ");
-				
-					
-				
-				scanf("%[^\n]", query.linea);
-				
-				fgetc(stdin);
-				
-				memset(respuesta, 0, strlen(respuesta));
-				
-				send(socketCliente, &query, sizeof(t_request), 0);
-				
-				recv(socketCliente, respuesta, sizeof(int), 0);
-				
-				longitud = atoi(respuesta);
-				
-				recv(socketCliente, respuesta, longitud, 0);
-				
-				printf("%s\n\n", respuesta);
-				
-				printf("Para volver Presionar cualquier tecla\n");
-				
-				fgetc(stdin);
-				
-				scanf("%c",&c);
-				
+				scanf("%c", &c);
 				system("clear");
-			}
-			
-			if(query.operacion == 2){
-				
-				send(socketCliente, &query, sizeof(t_request), 0);
-				
+			} else
+			{
+				printf("*~*~*~*~*~*~*~*~*~*~*~*~*~ Porcentaje de Asistencias *~*~*~*~*~*~*~*~*~*~*~*~*~*\n\n\n\n");
+				send(socketCliente, &info, sizeof(tInfoSocket), 0);
 				memset(respuesta, 0, strlen(respuesta));
-				
 				recv(socketCliente, respuesta, sizeof(int), 0);
-				
-				longitud = atoi(respuesta);
-				
-				recv(socketCliente, respuesta, longitud, 0); 
-				
+				tamanioRespuesta = atoi(respuesta);
+				recv(socketCliente, respuesta, tamanioRespuesta, 0);
 				printf("%s\n\n", respuesta);
-				
-				printf("Para volver Presionar cualquier tecla\n");
-				
+
+				printf("Presione enter para volver.\n");
 				fgetc(stdin);
-				
-				scanf("%c",&c);
-				
+				scanf("%c", &c);
 				system("clear");
 			}
 		}
 	}
-	
 }
-
 
 int main(int argc, char *argv[])
 {
 
-	if (argc < 2)
-    {
-        printf("\nInserte los parametros necesarios\n");
-        
-		getHelp();
-        
-		exit(1);
-    }
-    
-    if (strcmp(argv[1], "-help") == 0 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "-?") == 0)
-    {
-        getHelp();
-    }
-	
-    signal(SIGINT, salir);
-    
-	signal(SIGTERM, salir);
+	if (argc != 3)
+	{
+		if ((argc == 1) || (argc == 2) && (strcasecmp(argv[1], "-help") == 0 || strcasecmp(argv[1], "-h") == 0 || strcasecmp(argv[1], "-?") == 0))
+		{
+			printf("\nEste programa es un cliente para el servidor de gestión de asistencias de la UNLaM.\n");
+			printf("Una vez que el servidor se encuentra ejecutando y entrega su IP y puerto,\n");
+			printf("se debe ejecutar este cliente con dichos datos como parámetros.\n\n");
+			printf("Luego de loguearse podrá realizar distintas consultas a la base de datos\n");
+			printf("del sistema dependiendo de su rol en la universidad (Alumno o Docente).\n\n");
+			printf("Ejemplo de ejecución: \"./Cliente 192.168.0.9 8081\"\n\n");
+			printf("Señal para terminar proceso: SIGTERM.\n\n");
 
-    if ((socketCliente = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-        printf("SOCKET_CREATION_ERROR\n");
-        return 1;
-    }
+			return 0;
+		}
 
-    
-    set(argv[1], argv[2]);
+		printf("\nParámetros incorrectos, consulte la ayuda con: \"-help\", \"-h\" o \"-?\".\n");
+        return ERROR_PARAMETROS;
+	}
 
-    if (connect(socketCliente, 
-				(struct sockaddr *)&configuracionSocket,
-				 sizeof(configuracionSocket)) == -1)
-    {
+	signal(SIGINT, terminarProceso);
+	signal(SIGTERM, terminarProceso);
 
-        printf("CONECTION_REJECTED\n");
-        return 1;
-    }
-	
-	printf("Ingrese Nombre de Usuario: ");
-	
-	fflush(stdin);
-	
+	if ((socketCliente = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	{
+		printf("Error de conexión.\nSaliendo...\n\n");
+		return ERROR_SOCKET;
+	}
+
+	bzero(&(listenAddress.sin_zero), 8);
+	listenAddress.sin_family = AF_INET;
+	listenAddress.sin_addr.s_addr = inet_addr(argv[1]);
+	listenAddress.sin_port = htons(atoi(argv[2]));
+
+	if (connect(socketCliente, (struct sockaddr *)&listenAddress, sizeof(listenAddress)) == -1)
+	{
+		printf("Error de conexión.\nSaliendo...\n\n");
+		return ERROR_SOCKET;
+	}
+
+	printf("Usuario: ");
 	scanf("%[^\n]", usuario.usuario);
-	
 	fgetc(stdin);
-	
-	printf("\nIngrese Contraseña:");
-	
-	fflush(stdin);
+	printf("Contraseña: ");
+	scanf("%[^\n]", usuario.clave);
+	fgetc(stdin);
 
-	scanf("%[^\n]", usuario.password);
-	
-	fgetc(stdin);
-	
-	send(socketCliente, &usuario, sizeof(t_usuario), 0); 
-	
-    recv(socketCliente, respuesta, sizeof(int), 0); 
-	
-	longitud = atoi(respuesta);
-    
-	recv(socketCliente, respuesta, longitud, 0); 
-	
-	while(strcmp(respuesta, "ERROR") == 0) {
-		
-		printf("Usuario o Conraseña incorrecto\n");
-		
-		printf("Ingrese Usuario: ");
-		
-		fflush(stdin);
-		
+	send(socketCliente, &usuario, sizeof(tUsuario), 0);
+	recv(socketCliente, respuesta, sizeof(int), 0);
+	tamanioRespuesta = atoi(respuesta);
+	recv(socketCliente, respuesta, tamanioRespuesta, 0);
+
+	while (strcmp(respuesta, ERROR) == 0)
+	{
+		printf("Error en nombre de usuario o contraseña, vuelva a intentarlo.\n\n");
+		printf("Usuario: ");
 		scanf("%[^\n]", usuario.usuario);
-		
 		fgetc(stdin);
-		
-		printf("\nIngrese Contraseña: ");
-		
-		fflush(stdin);
-		
-		scanf("%[^\n]", usuario.password);
-		
+		printf("\nContraseña: ");
+		scanf("%[^\n]", usuario.clave);
 		fgetc(stdin);
-		
+
 		memset(respuesta, 0, sizeof(respuesta));
-		
-		send(socketCliente, &usuario, sizeof(t_usuario), 0);
-		
+		send(socketCliente, &usuario, sizeof(tUsuario), 0);
 		recv(socketCliente, respuesta, sizeof(int), 0);
-		
-		longitud = atoi(respuesta);
-		
-		recv(socketCliente, respuesta, longitud, 0);
+		tamanioRespuesta = atoi(respuesta);
+		recv(socketCliente, respuesta, tamanioRespuesta, 0);
+	}
+
+	token = strtok(respuesta, delim);
+
+	if (token != NULL)
+		strcpy(rol, token);
+	else {
+		printf("\nError en la base de datos.\n");
+		terminarProceso();
+	}
+
+	token = strtok(NULL, delim);
+
+	if (token != NULL)
+	{
+		comision = atoi(token);
+		token = NULL;
+		system("clear");
+	}
+	else {
+		printf("\nError en la base de datos.\n");
+		terminarProceso();
 	}
 	
-	char *token;
+	printf("\n------------------------------\n%s: %s\n------------------------------\n\n", rol, usuario.usuario);
 	
-	char delimitador[] = "=\n";
-	
-	char rol[10];
-	
-	int comision;
-	
-	token = strtok(respuesta, delimitador);
-	
-	if(token !=NULL){
-	
-		strcpy(rol, token);	
-	}
-		
-	token = strtok(NULL, delimitador);
-	
-	if(token !=NULL){
-	
-		comision = atoi(token);	
-	
-	}
-	
-	token = NULL;
-	
-	system("clear");
-	
-	printf("\n\t\tBIENVENIDO %s %s\n\n", rol, usuario.usuario);
-	
-	query.operacion = 0;
-	
-	while(query.operacion != 3){
+	do
+	{
+		printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~ Menú Principal *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~\n\n\n\n");
 
-		printf("\t\t**************************** MENU PRINCIPAL *******************************\n\n");
-		
-		if(!strcmp(rol, "DOCENTE")){
-
-			printf("1- Consultar Asistencias \n");
-
-			printf("2- Cargar Asistencias \n");
-
-			printf("3- EXIT \n");	
-
-			printf("\t\t************************************************************************\n\n");
+		if (strcmp(rol, "DOCENTE") == 0)
+		{
+			printf("1. Consultar asistencia de alumnos\n");
+			printf("2. Cargar asistencias de alumnos\n");
+			printf("3. Salir\n\n\n");
+		}
+		else
+		{
+			printf("1. Consultar asistencia en determinada fecha\n");
+			printf("2. Calcular porcentaje de asistencias\n");
+			printf("3. Salir\n\n\n");
 		}
 
-		else{ 
-			printf("1. Consultar asistencias \n");
+		printf("*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~\n\n\n\n");
 
-			printf("2. Calcular porcentaje asistencias \n");
-
-			printf("3. EXIT \n");
-
-			printf("\t\t************************************************************************\n\n");
-		}
-		
-        printf("Ingrese el nro de operación que desea realizar: ");
-
-        scanf("%d", &query.operacion);
-
+		printf("Opción: ");
+		scanf("%d", &info.codigo);
 		system("clear");
 
-        if(query.operacion < 1 || query.operacion > 3){
-
-            printf("Ingreso incorrecto. Ingrese nuevamente.\n\n");
-
+		if (info.codigo < 1 || info.codigo > 3)
+		{
 			system("clear");
-        }
+			printf("Opción incorrecta.\n\n\n\n");
+		}
+		else if (info.codigo < 3)
+		{
+			mostrarMenu(rol, comision);
+		}
+	} while (info.codigo != 3);
 
-        else if(query.operacion < 3)
-        {
-			operaciones(rol, comision);
-            
-        }
-        
-    }
-	send(socketCliente, &query, sizeof(t_request), 0);
-
-
-	printf("Finalizando el proceso, Por favor espere...");
-	sleep(3);
-    close(socketCliente);
-    
-	exit(1);
-		
+	send(socketCliente, &info, sizeof(tInfoSocket), 0);
+	printf("\n\n\nSaliendo...\n");
+	close(socketCliente);
+	
+	return 0;
 }
+
+/*
+# ------------------------------------FIN -----------------------------------------------------------------#
+# SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+# ---------------------------------------------------------------------------------------------------------# 
+*/

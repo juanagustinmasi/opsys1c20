@@ -2,7 +2,7 @@
 
 //  Trabajo practico: 3
 //  Ejercicio: 1
-//  Entrega: 1ra
+//  Entrega: 2da
 //  Integrantes:
 // 	    Daiana Gomez Nespola, DNI 38005120
 // 	    Juan Masi, DNI 37981647

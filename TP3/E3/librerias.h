@@ -1,3 +1,19 @@
+//  -----------------------ENCABEZADO------------------------------------------------------------------------
+
+//  Trabajo practico: 3
+//  Ejercicio: 3
+//  Entrega: 2da
+//  Integrantes:
+// 	    Daiana Gomez Nespola, DNI 38005120
+// 	    Juan Masi, DNI 37981647
+//      Guido Delbo, DNI 36982261
+// 	    Nicolas Fortunato, DNI 37864810
+// 	    Damian Perez, DNI 35375255
+
+//  Se asume que no se tendra mas de 50 socios
+//  ----------------------FIN ENCABEZADO---------------------------------------------------------------------
+
+
 #ifndef LIBRERIAS_H_INCLUDED
 #define LIBRERIAS_H_INCLUDED
 
@@ -95,3 +111,7 @@ int actualiza_asistencia(t_socio arraySocios[CANT_MAX_SOCIOS], long dni, char di
 
 
 #endif // LIBRERIAS_H_INCLUDED
+
+//  ------------------------------FIN------------------------------------------------------------------------
+//  SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+//  ---------------------------------------------------------------------------------------------------------

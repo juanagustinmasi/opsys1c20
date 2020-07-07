@@ -1,13 +1,10 @@
-all : Servidor
+all: Servidor
 
-Servidor : servidor.c funcionesServidor.o funcionesAuxiliares.o
-	gcc -o Servidor servidor.c funcionesServidor.o funcionesAuxiliares.o -pthread -lrt
+Servidor: servidor.c funciones.o
+	gcc -o Servidor servidor.c funciones.o -pthread -lrt
 
-funcionesServidor.o: funciones.h funcionesServidor.c
-	gcc -c funcionesServidor.c -pthread -lrt
+funciones.o: funciones.h funciones.c
+	gcc -c funciones.c -pthread -lrt
 
-funcionesAuxiliares.o: funciones.h funcionesAuxiliares.c
-	gcc -c funcionesAuxiliares.c -pthread -lrt
-
-clean :
+clean:
 	rm *.o

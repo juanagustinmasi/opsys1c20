@@ -1,68 +1,106 @@
-#include "funciones.h"
-/*
-***********************************************************************************
- Nombre Del Script:        Servidor
- Trabajo Practico Nro.:    3
- Ejercicio Nro.:           5
- Entrega Nro.:             1
+/*-----------------------ENCABEZADO------------------------------------------------------------------------
+
+ Nombre del programa: servidor.c
+ Trabajo practico: 3
+ Ejercicio: 5
+ Entrega: 3ra
  Integrantes:
-    Apellido            Nombre                  DNI
-    --------------------------------------------------
-   Fernández		    Jonathan		      37226233
-   Suriano				Lucas				  40429973
-   Cicarone				Florencia 			  40712842
-   Muñoz				Rocio Celeste		  39788890
-   Sosa					Melisa Agustina 	  40464205
-***********************************************************************************
-*/
-char ip[16];
+	    Daiana Gomez Nespola, DNI 38005120
+	    Juan Masi, DNI 37981647
+        Guido Delbo, DNI 36982261
+	    Nicolas Fortunato, DNI 37864810
+	    Damian Perez, DNI 35375255
+
+ ----------------------FIN ENCABEZADO---------------------------------------------------------------------*/
+
+#include "funciones.h"
+
 int main(int argc, char *argv[])
 {
+    struct sockaddr_in listenAddress;
 
-    socklen_t cl = sizeof(struct sockaddr_in);
-    struct sockaddr_in ca;
-    int socketCliente, serverSocket, sockfd, habilitar = 1;
-    pthread_t tid;
-
-    if (argc < 2)
+    if (argc != 3)
     {
-        printf("Por favor, ingrese un puerto y el archivo de USUARIO\n");
-        printf("Ejemplos:\n");
-        printf("\t\t./Servidor 9999 usuario.txt\n");
-        printf("\t\t./Servidor 54222 ../usuario.txt\n");
+        if ((argc == 1) || (argc == 2) && (strcasecmp(argv[1], "-help") == 0 || strcasecmp(argv[1], "-h") == 0 || strcasecmp(argv[1], "-?") == 0))
+        {
 
-        exit(255);
-    }
-    if (comprobacionBD(argv[2]) == 1)
-        return 1;
+            printf("\nEste programa es un servidor de gestión de asistencias de la UNLaM.\n");
+            printf("Para ejecutarlo debe ingresar como parámetros el nro. de puerto y\n");
+            printf("el archivo donde se encuentra la información de los usuarios.\n\n");
+            printf("Luego podrá ejecutar uno o más procesos cliente para interactuar con este servidor.\n\n");
+            printf("Ejemplo de ejecución: \"./Servidor 8081 usuario.txt\"\n\n");
+            printf("Señal para terminar proceso: SIGTERM.\n\n");
 
-    if (obtenerIP(ip))
-    {
-        printf("\nOcurrio un error al determina la IP local.\n");
-        exit(1);
+            return 0;
+        }
+
+        printf("\nParámetros incorrectos, consulte la ayuda con: \"-help\", \"-h\" o \"-?\".\n");
+        return ERROR_PARAMETROS;
     }
 
-    if (creacionSocket(&serverSocket, &habilitar) == 1)
-        return 1;
+    char logServidorConectado[500];
+    int socketCliente, serverSocket;
+    char ip[50];
+    struct sockaddr_in addr;
+    socklen_t addrlen;
+    pthread_t thread;
+    int v = 1;
 
-    ///Le paso IP y PUERTO
-    set(ip, argv[1]);
+    signal(SIGTERM, terminarProceso);
+    signal(SIGINT, terminarProceso);
 
-    bindListen(&serverSocket);
+    // Validación del archivo de usuarios
+    if (existeArchivoUsuarios(argv[2]) == 1)
+        return ERROR_ARCHIVO_USUARIOS;
 
-	//estas senales las ignora
-    signal(SIGCHLD, SIG_IGN);
-    signal(SIGTSTP, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
-    signal(SIGTTIN, SIG_IGN);
+    // Obtención de IP
+    if (ipConfig(ip))
+    {
+        printf("Error de conexión.\nSaliendo...\n\n");
+        return ERROR_IP;
+    }
 
-    //aca handlea
-    signal(SIGHUP, signal_handler);
-    signal(SIGTERM, signal_handler);
+    // Creación del socket
+    if ((serverSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+        printf("Error de conexión.\nSaliendo...\n\n");
+        return ERROR_SOCKET;
+    }
+    
+    // Configuración del socket
+    if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &v, sizeof(int)) == -1)
+    {
+        printf("Error de conexión 8.\nSaliendo...\n\n");
+        return ERROR_SOCKET;
+    }
 
-    ///Lo dejo corriendo como demonio
-    while (1)
-        aceptarRequests(&tid, &socketCliente, &serverSocket, &ca, &cl);
+    bzero(&(listenAddress.sin_zero), 8);
+    listenAddress.sin_family = AF_INET;
+    listenAddress.sin_addr.s_addr = inet_addr(ip);
+    listenAddress.sin_port = htons(atoi(argv[1]));
+
+    if (bind(serverSocket, (struct sockaddr *)&listenAddress, sizeof(struct sockaddr_in)) < 0)
+    {
+        printf("Puerto %d en uso, intente con otro puerto.\nSaliendo...", ntohs(listenAddress.sin_port));
+        return ERROR_SOCKET;
+    }
+
+    listen(serverSocket, 10);
+    sprintf(logServidorConectado, "\nServidor CONECTADO correctamente.\nIP: %s\nPuerto: %d\n", ip, ntohs(listenAddress.sin_port));
+    printf("%s\n", logServidorConectado);
+    grabarLog("./servidor.log", logServidorConectado);
+    fflush(stdout);
+
+    addrlen = sizeof(struct sockaddr_in);
+
+    while (TRUE)
+        recibeConexion(&thread, &socketCliente, &serverSocket, &addr, &addrlen);
 
     return 0;
 }
+
+/*
+# ------------------------------------FIN -----------------------------------------------------------------#
+# SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+# ---------------------------------------------------------------------------------------------------------# 
+*/

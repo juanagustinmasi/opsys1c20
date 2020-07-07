@@ -2,14 +2,14 @@
 
 //  Trabajo practico: 3
 //  Ejercicio: 4
-//  Entrega: 1ra
+//  Entrega: 2da
 //  Integrantes:
 // 	    Daiana Gomez Nespola, DNI 38005120
 // 	    Juan Masi, DNI 37981647
 //      Guido Delbo, DNI 36982261
 // 	    Nicolas Fortunato, DNI 37864810
 // 	    Damian Perez, DNI 35375255
-
+//
 //  ----------------------FIN ENCABEZADO---------------------------------------------------------------------
 #include <stdio.h>
 #include <string>
@@ -68,7 +68,7 @@ void parseoProceso(string linea, t_proceso *proceso)
 
     pos = linea.find(separador);
     proceso->pid = atoi(linea.substr(0, pos).data());
-    linea.erase(0, pos + separador.length());   
+    linea.erase(0, pos + separador.length());
 
     pos = linea.find(separador);
     proceso->cpu = atof(linea.substr(0, pos).data());
@@ -136,7 +136,7 @@ void controla(int valorLimiteCPU, int valorLimiteMEM)
     t_proceso proceso;
     map<int, int> registroProcesos;
     int resultado = 0;
-    t_datosProceso datosProceso; 
+    t_datosProceso datosProceso;
     string comando = "ps -e -o pid,%cpu,%mem,cmd | awk '$2 > " + to_string(valorLimiteCPU) + " || $3 > " + to_string(valorLimiteMEM) + " {print $0}'";
 
     mkfifo("./fifo", 0666);
@@ -145,7 +145,7 @@ void controla(int valorLimiteCPU, int valorLimiteMEM)
     while (ejecuta)
     {
         archivo = popen(comando.data(), "r");
-		//Verfico si abrio bien
+        //Verfico si abrio bien
         if (!archivo)
         {
             return;
@@ -179,14 +179,13 @@ void controla(int valorLimiteCPU, int valorLimiteMEM)
 
         sleep(1);
     }
-    
+
     // escribir fifo
     write(punteroEscritura, &datosProceso, sizeof(datosProceso));
 
     close(punteroEscritura);
     unlink("./fifo");
 }
-
 
 /*Hilo registro*/
 void registra()
@@ -209,7 +208,7 @@ void registra()
 
         // escribir archivo
         archivoSalida << datosProceso.hora << " "
-                << "${" << datosProceso.pid << "}: " << mensaje << " " << datosProceso.nombre << "." << endl;
+                      << "${" << datosProceso.pid << "}: " << mensaje << " " << datosProceso.nombre << "." << endl;
 
         // leer fifo
         read(punteroLectura, &datosProceso, sizeof(datosProceso));
@@ -229,23 +228,14 @@ void signal_handler(int num_sig)
 // Ayuda
 void mostrar_ayuda()
 {
-    cout << "AYUDA" << endl;
-    cout << "El script detecta fugas de memoria, excesiva utilización de CPU o ambas por parte de los procesos" << endl;
-	cout << "Para esto un proceso Control verifica mediante valores limites pasados, si algun proceso tiene algun exceso" << endl;
-    cout << "Se deben pasar los valores límites por parámetro." << endl;
-    cout << "El script recibe como parametro estos limites separados por espacio, los cuales deben estar comprendidos entre un valor entero ente 0 y 100" << endl;
-	cout << "Una vez detectado el exceso a treves de un FIFO se le pasa los datos del proceso a un proceso Registro"<< endl;
-	cout << "El proceso Registro recibirá los datos de los proceso y los registrará en un archivo "<< endl;
-	cout << "Se creara un archivo.txt llamado InformaProcesos.txt donde se guardara los datos"<< endl;
-    cout << "" << endl;
-    cout << "---------------------------------------------------------------------------------------" << endl;
+    cout << "Este programa verifica el porcentaje de utilización de memoria y CPU de los procesos corriendo en el sistema." << endl;
+	cout << "Para esto un proceso Control verifica mediante valores límite recibidos por parámetro, si algún proceso los sobrepasa." << endl;
+	cout << "Una vez detectado el exceso a trevés de un FIFO se le pasa los datos a un proceso Registro."<< endl;
+	cout << "El proceso Registro guardará la información en el archivo InformaProcesos.txt.\n\n"<< endl;
     cout << "SINTAXIS:" << endl;
-    cout << "./Ejercicio4.exe valorLimiteCPU valorLimiteMEM" << endl;
-    cout << "" << endl;
-    cout << "---------------------------------------------------------------------------------------" << endl;
-    cout << "Se debe ejecutar makefile para compilar el archivo" << endl;
-    cout << "Para finalizar la ejeucion del proceso principal utilizar kill -10 <PID>" << endl;
-    cout << "" << endl;
+    cout << "./Ejercicio4 [CPU_LIMITE] [MEMORIA_LIMITE]\n\n" << endl;
+    cout << "Los valores CPU_LIMITE y MEMORIA_LIMITE deben ser números enteros positivos menores a 100." << endl;
+    cout << "El proceso principal se detiene con:  \"kill -10 <PID>\"" << endl;
 }
 
 /*Proceso principal*/
@@ -254,31 +244,31 @@ int main(int argc, char *argv[])
     int valorLimiteCPU = 0;
     int valorLimiteMEM = 0;
 
-	//Validaciones
-    if (argc == 2){
-        if(!strcmp(argv[1], "-help") || !strcmp(argv[1], "-h") || !strcmp(argv[1], "-?")){
+    //Validaciones
+    if (argc == 2)
+    {
+        if (!strcmp(argv[1], "-help") || !strcmp(argv[1], "-h") || !strcmp(argv[1], "-?"))
+        {
             mostrar_ayuda();
             return EXIT_FAILURE;
-       }
-    }       
+        }
+    }
 
     if (argc != 3)
     {
-        cout << "Error: Se deben pasar 2 parametros" << endl;
+        cout << "Para consultar la ayuda de este programa ingrese como parámetro: -h, -help o -?." << endl;
         return EXIT_FAILURE;
     }
 
     if (!regex_match(argv[1], regex("([0-9]+)")))
     {
         cout << "Error: El primer parametro debe ser un valor entero comprendido entre 0 y 100" << endl;
-        cout << "" << endl;
         return EXIT_FAILURE;
     }
 
     if (!regex_match(argv[2], regex("([0-9]+)")))
     {
         cout << "Error: El segundo parametro debe ser un valor entero comprendido entre 0 y 100" << endl;
-        cout << "" << endl;
         return EXIT_FAILURE;
     }
 
@@ -288,7 +278,6 @@ int main(int argc, char *argv[])
     if (valorLimiteCPU < 0 || valorLimiteCPU > 100 || valorLimiteMEM < 0 || valorLimiteMEM > 100)
     {
         cout << "Error: Los valores esperados de los parametros son un valor entero comprendido entre 0 y 100" << endl;
-        cout << "" << endl;
         return EXIT_FAILURE;
     }
 
@@ -316,8 +305,10 @@ int main(int argc, char *argv[])
 
     control.join();
     registro.join();
-    
+
     return EXIT_SUCCESS;
 }
 
-// +++++++++++++++FIN DE ARCHIVO+++++++++++++++++++++++
+//  ------------------------------FIN------------------------------------------------------------------------
+//  SISTEMAS OPERATIVOS | MARTES Y JUEVES - TURNO NOCHE | ANIO 2020 | PRIMER CUATRIMESTRE
+//  ---------------------------------------------------------------------------------------------------------
