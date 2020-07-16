@@ -46,6 +46,12 @@ int main(int argc, char *argv[])
     pthread_t thread;
     int v = 1;
 
+	//estas senales las ignora
+    signal(SIGCHLD, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    
     signal(SIGTERM, terminarProceso);
     signal(SIGINT, terminarProceso);
 

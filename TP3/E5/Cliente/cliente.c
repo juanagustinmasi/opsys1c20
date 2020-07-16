@@ -3,7 +3,7 @@
  Nombre del programa: cliente.c
  Trabajo practico: 3
  Ejercicio: 5
- Entrega: 3ra
+ Entrega: 4ta
  Integrantes:
 	    Daiana Gomez Nespola, DNI 38005120
 	    Juan Masi, DNI 37981647
@@ -54,6 +54,17 @@ tUsuario usuario;
 void terminarProceso()
 {
 	printf("\nSaliendo...\n");
+	info.codigo = 3;
+    send(socketCliente, &info, sizeof(tInfoSocket), 0);
+	close(socketCliente);
+	exit(0);
+}
+
+void terminarProcesoPrevLogin()
+{
+	printf("\nSaliendo...\n");
+	sprintf(usuario.usuario, "C");
+    send(socketCliente, &usuario, sizeof(tUsuario), 0);
 	close(socketCliente);
 	exit(0);
 }
@@ -196,8 +207,14 @@ int main(int argc, char *argv[])
         return ERROR_PARAMETROS;
 	}
 
-	signal(SIGINT, terminarProceso);
-	signal(SIGTERM, terminarProceso);
+		//estas senales las ignora
+    signal(SIGCHLD, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+	
+	signal(SIGINT, terminarProcesoPrevLogin);
+	signal(SIGTERM, terminarProcesoPrevLogin);
 
 	if ((socketCliente = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -245,6 +262,10 @@ int main(int argc, char *argv[])
 		recv(socketCliente, respuesta, tamanioRespuesta, 0);
 	}
 
+	signal(SIGINT, terminarProceso);
+	signal(SIGTERM, terminarProceso);
+
+	
 	token = strtok(respuesta, delim);
 
 	if (token != NULL)

@@ -42,6 +42,10 @@
 #define FALSE 0
 #define FIN "FIN"
 #define ERROR "ERROR"
+#define ERROR_NO_HAY_ARCHIVO "ERROR. No se encuentra el archivo."
+#define ERROR_NO_HAY_DATOS "ERROR. No se encontraron datos."
+#define ERROR_NO_HAY_DATOS_PARA_FECHA "ERROR. No se encontraron datos para la fecha ingresada."
+#define ERROR_ASISTENCIAS_YA_CARGADAS "ERROR. Asistencias ya cargadas."
 #define ERROR_ARCHIVO_USUARIOS 11
 #define ERROR_IP 12
 #define ERROR_SOCKET 13

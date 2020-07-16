@@ -18,6 +18,7 @@
 
 void terminarProceso()
 {
+		printf("\nServidor cerrado, todos los procesos terminaron correctamente.\n");
 	grabarLog("./servidor.log", "Servidor cerrado, todos los procesos terminaron correctamente.");
 	exit(0);
 }
@@ -116,6 +117,7 @@ int loguea(FILE *pf, int socketCliente, tUsuario *info, tInfo *registro)
 		fgets(linea, 100, pf);
 		token = NULL;
 	}
+
 	enviaAlSocket(ERROR, socketCliente, tamMsg);
 	usleep(1 * 1000);
 	return 0;
@@ -125,14 +127,16 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 {
 	char lineas[100];
 	char delimitador[] = "|\n";
-	char tamMsg[10];
+	char tamMsg[50];
 	char nombreAsistencia[500];
+	char tituloLog[100];
 
 	if (strcmp(usuarioActual->rol, "D") == 0)
 	{
 		if (info->codigo == 1)
 		{
-			imprimirMsg("DOCENTE -> Listado de Asistencias");
+			sprintf(tituloLog, "DOCENTE %s -> Listado de Asistencias", usuarioActual->nombre);
+			imprimirMsg(tituloLog);
 			snprintf(nombreAsistencia, sizeof(nombreAsistencia), "%sAsistencia_%s_%d.txt", "./Asistencia_Fecha_Comision/", info->dato, usuarioActual->cod_comision);
 
 			if (access(nombreAsistencia, F_OK) != -1)
@@ -154,8 +158,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 			}
 			else
 			{
-				imprimirMsg("Error, no se encuentra el archivo");
-				enviaAlSocket(ERROR, socketCliente, tamMsg);
+				imprimirMsg(ERROR_NO_HAY_ARCHIVO);
+				enviaAlSocket(ERROR_NO_HAY_ARCHIVO, socketCliente, tamMsg);
 			}
 		}
 
@@ -167,7 +171,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 			struct tm *tiempoLocal = localtime(&tiempo);
 			char fecha[20];
 
-			imprimirMsg("DOCENTE -> Cargar Asistencias");
+			sprintf(tituloLog, "DOCENTE %s -> Cargar Asistencias", usuarioActual->nombre);
+			imprimirMsg(tituloLog);
 			strftime(fecha, sizeof(fecha), "%Y-%m-%d", tiempoLocal);
 			snprintf(nombreAsistencia, sizeof(nombreAsistencia), "%sAsistencia_%s_%d.txt", "./Asistencia_Fecha_Comision/", fecha, usuarioActual->cod_comision);
 			
@@ -231,8 +236,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 			}
 			else
 			{
-				imprimirMsg("Error, asistencias ya cargadas.");
-				enviaAlSocket(ERROR, socketCliente, tamMsg);
+				imprimirMsg(ERROR_ASISTENCIAS_YA_CARGADAS);
+				enviaAlSocket(ERROR_ASISTENCIAS_YA_CARGADAS, socketCliente, tamMsg);
 				usleep(1 * 1000);
 			}
 		}
@@ -241,7 +246,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 	{
 		if (info->codigo == 1)
 		{
-			imprimirMsg("ALUMNO -> Consulta de Asistencia");
+			sprintf(tituloLog, "ALUMNO %s -> Consulta de Asistencias", usuarioActual->nombre);
+			imprimirMsg(tituloLog);
 			snprintf(nombreAsistencia, sizeof(nombreAsistencia), "%sAsistencia_%s_%d.txt", "./Asistencia_Fecha_Comision/", info->dato, usuarioActual->cod_comision);
 
 			if (access(nombreAsistencia, F_OK) != -1)
@@ -298,8 +304,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 			}
 			else
 			{
-				imprimirMsg("Error, no hay datos disponibles para la fecha ingresada");
-				enviaAlSocket(ERROR, socketCliente, tamMsg);
+				imprimirMsg(ERROR_NO_HAY_DATOS_PARA_FECHA);
+				enviaAlSocket(ERROR_NO_HAY_DATOS_PARA_FECHA, socketCliente, tamMsg);
 			}
 		}
 
@@ -314,7 +320,8 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 			if (dir == NULL)
 				printf("Error leyendo el archivo de asistencias\n");
 
-			imprimirMsg("ALUMNO -> Porcentaje de Asistencias");
+			sprintf(tituloLog, "ALUMNO %s -> Porcentaje de Asistencias", usuarioActual->nombre);
+			imprimirMsg(tituloLog);
 			imprimirMsg("Porcentaje de Asistencias enviado");
 
 			while ((ent = readdir(dir)) != NULL)
@@ -331,13 +338,22 @@ void procesaConsulta(FILE *pf, int socketCliente, tInfoSocket *info, tInfo *usua
 
 			closedir(dir);
 
-			float porcentajeAsistencia = (presente / (presente + ausente)) * 100;
-			float porcentajeInasistencia = (ausente / (presente + ausente)) * 100;
-
+			float porcentajeAsistencia = 0;
+			float porcentajeInasistencia = 0;
 			char msgPorcentaje[100];
-			sprintf(msgPorcentaje, "Presente: %.0f%%\nAusente: %.0f%%", porcentajeAsistencia, porcentajeInasistencia);
-			imprimirMsg(msgPorcentaje);
-			enviaAlSocket(msgPorcentaje, socketCliente, tamMsg);
+
+			if( presente != 0 || ausente != 0) {
+				porcentajeAsistencia = (presente / (presente + ausente)) * 100;
+				porcentajeInasistencia = (ausente / (presente + ausente)) * 100;
+
+				sprintf(msgPorcentaje, "Presente: %.0f%%\nAusente: %.0f%%", porcentajeAsistencia, porcentajeInasistencia);
+				imprimirMsg(msgPorcentaje);
+				enviaAlSocket(msgPorcentaje, socketCliente, tamMsg);
+			} else
+			{
+				imprimirMsg(ERROR_NO_HAY_DATOS);
+				enviaAlSocket(ERROR_NO_HAY_DATOS, socketCliente, tamMsg);
+			}
 		}
 	}
 }
@@ -352,24 +368,31 @@ void *recibeConsulta(void *socket)
 	int logueoOk = 0;
 
 	recv(sockfd, &usuario, sizeof(tUsuario), 0);
-	logueoOk = loguea(pf, sockfd, &usuario, &usuarioActual);
-
-	while (logueoOk == 0)
-	{ 
-		recv(sockfd, &usuario, sizeof(tUsuario), 0);
+	if(strcmp(usuario.usuario, "C") != 0){
 		logueoOk = loguea(pf, sockfd, &usuario, &usuarioActual);
-	}
-
-	recv(sockfd, &info, sizeof(tInfoSocket), 0);
-
-	while (info.codigo != 3)
-	{
-		procesaConsulta(pf, sockfd, &info, &usuarioActual);
+		while (logueoOk == 0)
+		{ 
+			recv(sockfd, &usuario, sizeof(tUsuario), 0);
+			logueoOk = loguea(pf, sockfd, &usuario, &usuarioActual);
+		}
 		recv(sockfd, &info, sizeof(tInfoSocket), 0);
+
+		while (info.codigo != 3)
+		{
+			procesaConsulta(pf, sockfd, &info, &usuarioActual);
+			recv(sockfd, &info, sizeof(tInfoSocket), 0);
+		}
 	}
 
 	char msjDesconexion[500];
-	sprintf(msjDesconexion, "Cliente desconectado.\n\"%s\" cerró sesión.\n", usuarioActual.nombre);
+	
+	if(strcmp(usuarioActual.nombre, "") != 0){ 
+		sprintf(msjDesconexion, "Cliente desconectado.\n\"%s\" cerró sesión.\n", usuarioActual.nombre);
+	}else
+	{
+		sprintf(msjDesconexion, "Cliente desconectado.\n");
+	}
+
 	printf("%s", msjDesconexion);
 	grabarLog("./servidor.log", msjDesconexion);
 	fflush(stdout);
